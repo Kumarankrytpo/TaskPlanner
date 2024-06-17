@@ -1,0 +1,51 @@
+.login_bg {
+  background: url("../public/loginBG.jpg");
+  background-size: cover;
+  background-position: center;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center; /* Horizontally center the .center div */
+  align-items: center; /* Vertically center the .center div */
+}
+
+.center {
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+.header_button_login{
+  background-color: white;
+  border: none;
+}
+
+.header_button_signup{
+  background-color: black;
+  color: white;
+  font-size: 7 px;
+  border: none;
+}
+
+.wrong_inputField{
+  border-color: red;
+}
+
+.react-toastify__toast-container {
+  top: 0;
+  right: 0;
+}
