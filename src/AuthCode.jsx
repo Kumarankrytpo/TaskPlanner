@@ -1,7 +1,7 @@
 import "./authcode.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import {  useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -11,22 +11,9 @@ function AuthCode(props) {
   const apiCalled = useRef(false);
   const [authcode, setAuthCode] = useState("");
   const navigation = useNavigate();
-
-  useEffect(() => {
-    console.log("auth code intiation",sessionStorage.getItem("accesstoken"));
-    if(sessionStorage.getItem("accesstoken")!=null && sessionStorage.getItem("refreshtoken")!=null
-  && sessionStorage.getItem("username")!=null){
-    if (userData.userid && !apiCalled.current) {
-      authcodeIntiation(userData,navigation);
-      apiCalled.current = true;
-    }
-  }else{
-    navigation("/");
-  }
-    
-    console.log("INSIDE AUTH CODE TAB ");
-  }, [userData,navigation]);
-
+  useEffect(()=>{
+    authcodeIntiation(userData,navigation);
+  },[])
   const validate = () => {
     console.log("auth code validation ");
     fetch("http://localhost:8080/webapi/auth/authCodeCheck", {
@@ -51,6 +38,7 @@ function AuthCode(props) {
       })
       .then((data) => {
         const respData = JSON.parse(JSON.stringify(data));
+        console.log("Status >>",respData);
         if(respData.status==="sessionexpired"){
           sessionStorage.removeItem("accesstoken");
         sessionStorage.removeItem("refreshtoken");
@@ -134,7 +122,7 @@ function authcodeIntiation(userData,navigation) {
        }else if(respData.status==="tokenrefreshed"){
          sessionStorage.removeItem("accesstoken");
          sessionStorage.setItem("accesstoken",data.accesstoken);
-         authcodeIntiation();
+         authcodeIntiation(userData,navigation);
        }
     }).catch((e) => {
       console.log("Error in API", e);

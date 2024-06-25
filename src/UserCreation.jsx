@@ -52,81 +52,73 @@ function UserCreation({ setCurrent, setUserCreationRen }) {
     };
 
     useEffect(() => {
-        if (
-            sessionStorage.getItem("accesstoken") != null &&
-            sessionStorage.getItem("refreshtoken") != null &&
-            sessionStorage.getItem("username") != null
-        ) {
-            fetch("http://localhost:8080/webapi/auth/getEmpID", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    const resp = JSON.parse(JSON.stringify(data));
-                    console.log("RETURN DATE", resp);
-                    setEmpid("EMP" + resp.empcode);
-                })
-                .catch((e) => {
-                    console.error("There was a problem with the fetch operation:", e);
-                });
-        } else {
-            navigation("/");
-        }
-    }, [navigation]);
+      fetch("http://localhost:8080/webapi/auth/getEmpID", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const resp = JSON.parse(JSON.stringify(data));
+          console.log("RETURN DATE", resp);
+          setEmpid("EMP" + resp.empcode);
+        })
+        .catch((e) => {
+          console.error("There was a problem with the fetch operation:", e);
+        });
+    }, []);
 
     const saveUser = () => {
-        const saveData = {
-            firstname: firstname,
-            lastname: lastname,
-            emailid: emailid,
-            empid: empid,
-            role: role,
-            reportto: reportto,
-            username: username,
-            password: password,
-        };
-        console.log("JSON <>>>", JSON.stringify(saveData));
-        fetch("http://localhost:8080/webapi/auth/usercreation", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify(saveData),
+      const saveData = {
+        firstname: firstname,
+        lastname: lastname,
+        emailid: emailid,
+        empid: empid,
+        role: role,
+        reportto: reportto,
+        username: username,
+        password: password,
+      };
+      console.log("JSON <>>>", JSON.stringify(saveData));
+      fetch("http://localhost:8080/webapi/auth/usercreation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(saveData),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
         })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("SSSSS", data);
-                const resp = JSON.parse(JSON.stringify(data));
-                console.log("RESPOEN");
-                console.log("response >>", resp);
-                if (resp.status === "success") {
-                    toast.success("User Created");
-                    setUserCreationRen(false);
-                    setCurrent("home");
-                } else if (resp.status === "existing user") {
-                    toast.error("User Name Already Exist");
-                } else {
-                    toast.error("User not Created");
-                }
-            })
-            .catch((exception) => {
-                console.log("Exception : ", exception);
-            });
+        .then((data) => {
+          console.log("SSSSS", data);
+          const resp = JSON.parse(JSON.stringify(data));
+          console.log("RESPOEN");
+          console.log("response >>", resp);
+          if (resp.status === "success") {
+            toast.success("User Created");
+            setUserCreationRen(false);
+            setCurrent("home");
+          } else if (resp.status === "existing user") {
+            toast.error("User Name Already Exist");
+          } else {
+            toast.error("User not Created");
+          }
+        })
+        .catch((exception) => {
+          console.log("Exception : ", exception);
+        });
     };
     const handleSearch = (value) => {
         const suggestions = [

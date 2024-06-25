@@ -7,6 +7,7 @@ import {useLocation} from 'react-router-dom';
 import { FaBuffer} from "react-icons/fa6";
 import TaskCreation from './TaskCreation';
 import TaskDashboard from './TaskDashboard';
+import './dashboard.css'
 
 function addingTabDetails(role){
   const items = [
@@ -46,7 +47,7 @@ function addingTabDetails(role){
 function DashBoard(props) {
     const state = useLocation();
     const userdata = JSON.parse(JSON.stringify(state));
-    console.log(userdata.state.role);
+    console.log("INSE",userdata.state.role);
     const [current, setCurrent] = useState('');
     const [userCreationRen,setUserCreationRen] = useState(false);
     const items = addingTabDetails(userdata.state.role);
@@ -71,8 +72,9 @@ function DashBoard(props) {
       setUserCreationRen(false);
       setTaskDashboardRen(true);
     }
-
   };
+   
+   
   return (
     <div>
       <div class="admin_dashboard">
@@ -88,6 +90,14 @@ function DashBoard(props) {
        {taskCreationRen && <TaskCreation></TaskCreation>}
        {taskDashboardRen && <TaskDashboard></TaskDashboard>}
       </div>
+
+     <div class='mainOptionContainer'>
+     <div class='optionsContainer'>
+         <span style={{width:"40px",height:"40px",color:"white"}}><MdDashboard/></span>
+        <h5 style={{marginTop:"20%"}}>User Creation</h5>
+      </div>
+     </div>
+      
     </div>
   );
 }
