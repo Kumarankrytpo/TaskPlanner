@@ -1,21 +1,64 @@
-.optionsContainer{
-    width: 10%;
-    height: 10%;
-  text-align: center;
-  padding: 10px;
-
-  /* From https://css.glass */
-  background: rgb(0, 0, 0);
-  color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.586);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(11, 4, 4, 0.495);
-}
-
-.mainOptionContainer{
+.mainOptionContainer {
     padding: 30px;
     height: 100vh;
     width: 100vw;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 20px; /* Adjusts horizontal space between items */
+    row-gap: 20px; /* Reduces vertical space between rows */
+    justify-content: flex-start; /* Aligns items to the start (left) */
+    align-items: stretch; /* Aligns the items to the top */
+    align-content: flex-start;
 }
+
+.optionsContainer {
+    width: 13%;
+    text-align: center;
+    padding: 10px;
+    margin: 0; /* Ensure no extra margin */
+
+    /* From https://css.glass */
+background: rgba(255, 255, 255, 0.2);
+border-radius: 16px;
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(5px);
+-webkit-backdrop-filter: blur(5px);
+border: 1px solid rgba(255, 255, 255, 0.3);
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    /* Adjust height to be as minimal as possible */
+    height: 10%; 
+    min-height: 100px; /* Set a reasonable minimum height */
+}
+
+.iconsstyle {
+    font-size: 40px;
+    margin: 0; /* Ensure no extra margin */
+}
+
+h5 {
+    margin-top: 5px; /* Reduce margin as needed */
+    margin-bottom: 0; /* Ensure no extra margin */
+    line-height: 1;
+}
+
+.optionsContainerhome--hover {
+    background-color: #333; /* Hover color */
+  }
+
+  
+  .ant-menu {
+    display: flex;
+    justify-content: space-between;
+    flex: 0 0 auto; /* Set flex properties to fix "TASK PLANNER" position */
+  }
+  
+  .ant-menu-item:first-child {
+    flex: 1; /* Make the first menu item (TASK PLANNER) take up some space */
+  }

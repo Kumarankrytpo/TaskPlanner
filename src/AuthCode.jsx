@@ -1,14 +1,14 @@
 import "./authcode.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useContext} from "react";
+import { GlobalContext } from './utils/GlobalContext';
 import { useLocation, useNavigate } from "react-router-dom";
-import {  useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function AuthCode(props) {
   const { state } = useLocation();
+  const { updateGlobalValue } = useContext(GlobalContext);
   const userData = JSON.parse(JSON.stringify(state));
-  const apiCalled = useRef(false);
   const [authcode, setAuthCode] = useState("");
   const navigation = useNavigate();
   useEffect(()=>{
@@ -48,11 +48,8 @@ function AuthCode(props) {
            sessionStorage.removeItem("accesstoken");
            sessionStorage.setItem("accesstoken",data.accesstoken);
          }else if (respData.status === "success") {
-          navigation("/dashboard", {
-            state: {
-              role: userData.role,
-            },
-          });
+          updateGlobalValue(userData.role);
+          navigation("/dashboard");
         } else {
           toast.error("Code Mismatch");
         }

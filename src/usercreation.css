@@ -17,3 +17,8 @@
 .usercreation_bg{
     background-color: black;
 }
+
+.usercreationmain{
+  width: 100vw;
+  height: 100vh;
+}

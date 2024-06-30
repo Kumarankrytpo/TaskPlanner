@@ -2,29 +2,30 @@ import { useEffect, useState } from "react";
 import { FaAnglesDown ,FaCheck   } from "react-icons/fa6";
 
 function TaskDashboard(){
+    console.log("inside task dashboard");
     const [taskdetails,setTaskDetails] = useState([]);
     const [expandedTaskIndex, setExpandedTaskIndex] = useState(null); 
     useEffect(()=>{
       setTaskDetails([{
         TaskName : "Task 1",
         SubTaskCount : 0,
-        Deadline : "2024-05-13 22:00"
+        Deadline : "2024-07-13 22:00"
       },
       {
         TaskName : "Task 2",
         SubTaskCount : 1,
         Subtaskdetails :[{
           subtaskheader : "SUBTASK1",
-          Deadline : "2024-05-13 22:00"
+          Deadline : "2024-07-13 22:00"
         },{
           subtaskheader : "SUBTASK2",
-          Deadline : "2024-05-13 22:00"
+          Deadline : "2024-07-13 22:00"
         }]
       },
       {
         TaskName : "Task 3",
         SubTaskCount : 0,
-        Deadline : "2024-05-13 22:00"
+        Deadline : "2024-07-13 22:00"
       },
     ])
     }, [])
