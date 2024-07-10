@@ -46,18 +46,21 @@ function AuthCode(props) {
         sessionStorage.removeItem("username");
           navigation("/")
          }else if(respData.status==="tokenrefreshed"){
-           sessionStorage.removeItem("accesstoken");
-           sessionStorage.setItem("accesstoken",data.accesstoken);
+          sessionStorage.removeItem("accesstoken");
+          sessionStorage.setItem("accesstoken", data.token);
+          console.log("session storge accesstocken refreshed ",sessionStorage.getItem("accesstoken"))
          }else if (respData.status === "success") {
           updateGlobalValue(userData.role);
-          
+
           navigation("/dashboard");
         } else {
           toast.error("Code Mismatch");
+          
         }
       })
       .catch((e) => {
         console.log("Error in API", e);
+        navigation("/");
       });
   };
 

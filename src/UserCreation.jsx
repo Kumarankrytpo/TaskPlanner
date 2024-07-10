@@ -8,15 +8,72 @@ import {
   SecurityScanOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { TextField } from "@mui/material";
+import { useEffect, useState, useContext } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AutoComplete } from "antd";
+import Autocomplete from "@mui/material/Autocomplete";
 import { useNavigate } from "react-router-dom";
+import { GlobalContext } from "./utils/GlobalContext";
 
 const { TabPane } = Tabs;
 
+const getuserlist = async (navigation, userName) => {
+  console.log("INSIDE USER LIST METHOD");
+  let userlist = [];
+
+  try {
+    const response = await fetch("http://localhost:8080/webapi/auth/getUsers", {
+      method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    const respData = JSON.parse(JSON.stringify(data));
+    console.log("Status >>", respData);
+
+    if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+      navigation("/");
+    } else if (respData.status === "tokenrefreshed") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "Session storage accesstoken refreshed",
+        sessionStorage.getItem("accesstoken")
+      );
+    } else if (respData.status === "success") {
+      console.log("After user list API hit >>>", respData.userlist);
+      if (Array.isArray(respData.userlist.myArrayList)) {
+        userlist = respData.userlist.myArrayList.map((item) => item.map);
+      }
+      console.log("<><><<<<><><><><><", userlist);
+    }
+  } catch (e) {
+    console.error("There was a problem with the fetch operation:", e);
+  }
+
+  console.log("Before user list return", userlist);
+  return userlist;
+};
+
 function UserCreation({ setCurrent, setUserCreationRen }) {
+  const navigation = useNavigate();
   const [activeTab, setActiveTab] = useState("1");
   const [firstname, setFirstName] = useState("");
   const [lastname, setLastName] = useState("");
@@ -26,8 +83,11 @@ function UserCreation({ setCurrent, setUserCreationRen }) {
   const [reportto, setReportTo] = useState("");
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const { userName } = useContext(GlobalContext);
   const [users, SetUsers] = useState([]);
-  const navigation = useNavigate();
+  const [roles, setRoles] = useState(["Project Manager", "Team Lead"]);
+
+  console.log("aftr useres set .", users);
 
   const nextTab = (key) => {
     setActiveTab(key);
@@ -54,25 +114,52 @@ function UserCreation({ setCurrent, setUserCreationRen }) {
   useEffect(() => {
     fetch("http://localhost:8080/webapi/auth/getEmpID", {
       method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+      }),
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-    })
-      .then((response) => {
+    }).then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         return response.json();
       })
       .then((data) => {
-        const resp = JSON.parse(JSON.stringify(data));
-        console.log("RETURN DATE", resp);
-        setEmpid("EMP" + resp.empcode);
+        const respData = JSON.parse(JSON.stringify(data));
+        console.log("EMPD CODE API", respData);
+        if (respData.status === "sessionexpired") {
+          sessionStorage.removeItem("accesstoken");
+          sessionStorage.removeItem("refreshtoken");
+          sessionStorage.removeItem("username");
+          navigation("/");
+        } else if (respData.status === "tokenrefreshed") {
+          sessionStorage.removeItem("accesstoken");
+          sessionStorage.setItem("accesstoken", data.token);
+          console.log(
+            "session storge accesstocken refreshed ",
+            sessionStorage.getItem("accesstoken")
+          );
+        } else if (respData.status === "success") {
+          setEmpid("EMP" + respData.empcode);
+          console.log("after empd code >>>"+empid);
+        }
       })
       .catch((e) => {
         console.error("There was a problem with the fetch operation:", e);
       });
+
+    const fetchUserList = async () => {
+      const users = await getuserlist(navigation, userName);
+      SetUsers(users); // assuming you have a state setter for options
+    };
+
+    fetchUserList();
   }, []);
 
   const saveUser = () => {
@@ -119,29 +206,6 @@ function UserCreation({ setCurrent, setUserCreationRen }) {
       .catch((exception) => {
         console.log("Exception : ", exception);
       });
-  };
-  const suggestions = [
-    { name: "kumaran" },
-    { name: "apple" },
-    { name: "banana" },
-    { name: "orange" },
-    { name: "grape" },
-    { name: "strawberry" },
-  ];
-  const handleSearch = (value) => {
-    
-    const filteredSuggestions = suggestions.filter((suggestion) =>
-      suggestion.name.toLowerCase().includes(value.toLowerCase())
-    );
-
-    // Map the filtered suggestions to the format required by AutoComplete
-    SetUsers(
-      filteredSuggestions.map((suggestion) => ({ value: suggestion.name }))
-    );
-  };
-
-  const handleFocus = () => {
-    SetUsers([]);
   };
 
   const onTabChange = (key) => {
@@ -220,20 +284,31 @@ function UserCreation({ setCurrent, setUserCreationRen }) {
               onChange={inputChange}
             ></input>
             <h3>Reporting To</h3>
-            <input
-              type="text"
-              name="reportto"
+
+            <Autocomplete
               value={reportto}
-              onChange={inputChange}
-            ></input>
-            <AutoComplete
+              onChange={(event, newValue) => {
+                setReportTo(newValue);
+              }}
               options={users}
-              onSearch={handleSearch}
-              onSelect={onSelect}
-              style={{ width: 200 }}
-              onFocus={handleFocus}
-              placeholder="Report To"
-            ></AutoComplete>
+              getOptionLabel={(option) => (option ? option.name : "")}
+              isOptionEqualToValue={(option, value) =>
+                option.empid === value.empid
+              }
+              renderOption={(props, option) => (
+                <li {...props}>
+                  {option.name} ({option.role})
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Options"
+                  variant="outlined"
+                />
+              )}
+              sx={{ mb: 2, width: "100%" }}
+            />
 
             <br></br>
             <br></br>

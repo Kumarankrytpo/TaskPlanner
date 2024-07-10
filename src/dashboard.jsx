@@ -35,14 +35,20 @@ function addingTabDetails(role){
       key: 'tasktab',
       icon: <MdDashboard /> ,
     },
+    {
+      label: 'Task Deatils',
+      key: 'taskdetails',
+      icon: <MdDashboard /> ,
+    }
    ];
   var filteredItems=[];
   if(role==="Admin"){
-    filteredItems = items.filter(obj => obj.key !== 'taskadd' || obj.key !== 'tasktab'); 
+    filteredItems = items.filter(obj =>  obj.key !== 'tasktab' && obj.key !== 'taskdetails'); 
   }else if(role==="Project Manager"){
     filteredItems = items.filter(obj => obj.key !== 'useradd'); 
   }
-
+  
+  console.log("menu items>>>",filteredItems)
   return filteredItems;
 }
 
@@ -57,6 +63,7 @@ function DashBoard() {
     const [itemrenderer,setItemrenderer] = useState(true);
     const [menuitems,setMenuitems] = useState([]);
     const navigation = useNavigate();
+    const [taskdetailsrend,setTaskdetailsRen] = useState(false);
 
 
     useEffect(()=>{
@@ -83,18 +90,22 @@ function DashBoard() {
         setUserCreationRen(false);
         settaskCreationRen(false);
         setTaskDashboardRen(false);
+        setTaskdetailsRen(false);
     }else if(key==="useradd"){
         setUserCreationRen(true);
         setTaskDashboardRen(false);
         settaskCreationRen(false);
+        setTaskdetailsRen(false);
     }else if(key==="taskadd"){
       settaskCreationRen(true);
       setUserCreationRen(false);
       setTaskDashboardRen(false);
+      setTaskdetailsRen(false);
     }else if(key==="tasktab"){
       settaskCreationRen(false);
       setUserCreationRen(false);
       setTaskDashboardRen(true);
+      setTaskdetailsRen(false);
     }
   };
 
@@ -104,6 +115,7 @@ function DashBoard() {
         setUserCreationRen(false);
       settaskCreationRen(false);
       setTaskDashboardRen(false);
+      setTaskdetailsRen(false);
       setItemrenderer(true);
        }else if(menulable.key==="logout"){
         logout();
