@@ -1,8 +1,9 @@
 import './App.css'
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState,useContext} from 'react';
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+import { GlobalContext } from './utils/GlobalContext';
 
 
 function Login() {
@@ -10,6 +11,8 @@ function Login() {
   const[username,setLoginUserName] = useState("");
   const[password,setLoginPassword] = useState("");
   const navigation = useNavigate();
+  const {setUserName} = useContext(GlobalContext);
+
 
   useEffect(()=>{
     sessionStorage.removeItem("accesstoken");
@@ -51,6 +54,7 @@ function Login() {
             sessionStorage.setItem("refreshtoken",respData.refreshtoken);
             sessionStorage.setItem("username",respData.username);
             toast.success('Login Successful');
+            setUserName(username);
             navigation("/authcode",{
               state : {
                 emailid : respData.emailid,

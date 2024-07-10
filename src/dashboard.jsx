@@ -1,13 +1,15 @@
 import { UserAddOutlined,HomeOutlined  } from '@ant-design/icons';
 import { MdDashboard } from "react-icons/md";
 import { Menu } from 'antd';
-import { useEffect, useState ,useContext} from 'react';
+import { useEffect, useState ,useContext,useMemo} from 'react';
 import { useNavigate } from "react-router-dom";
 import UserCreation from './UserCreation';
 import { FaBuffer} from "react-icons/fa6";
 import TaskCreation from './TaskCreation';
 import TaskDashboard from './TaskDashboard';
 import { GlobalContext } from './utils/GlobalContext';
+
+
 
 import './dashboard.css'
 
@@ -36,7 +38,7 @@ function addingTabDetails(role){
    ];
   var filteredItems=[];
   if(role==="Admin"){
-    filteredItems = items.filter(obj => obj.key !== 'taskadd'); 
+    filteredItems = items.filter(obj => obj.key !== 'taskadd' || obj.key !== 'tasktab'); 
   }else if(role==="Project Manager"){
     filteredItems = items.filter(obj => obj.key !== 'useradd'); 
   }
@@ -49,7 +51,7 @@ function DashBoard() {
     const { userRole } = useContext(GlobalContext);
     const [userCreationRen,setUserCreationRen] = useState(false);
     console.log("USER ROLE >>",userRole);
-    const items = addingTabDetails(userRole);
+    const items = useMemo(()=>addingTabDetails(userRole)) ;
     const [taskCreationRen,settaskCreationRen] = useState(false);
     const [taskDashboardRen,setTaskDashboardRen] = useState(false);
     const [itemrenderer,setItemrenderer] = useState(true);
@@ -90,14 +92,14 @@ function DashBoard() {
       setUserCreationRen(false);
       setTaskDashboardRen(false);
     }else if(key==="tasktab"){
-      settaskCreationRen(true);
+      settaskCreationRen(false);
       setUserCreationRen(false);
       setTaskDashboardRen(true);
     }
   };
 
   const menuOnclick = (menulable) =>{
-       console.log("menu lable",menulable.key);
+       console.log("menu lable",menulable.key,"  asdasdasd ",userRole);
        if(menulable.key==="maintab"){
         setUserCreationRen(false);
       settaskCreationRen(false);
@@ -113,6 +115,13 @@ function DashBoard() {
     sessionStorage.removeItem("refreshtoken");
     sessionStorage.removeItem("username");
     navigation("/");
+  }
+
+  const mainPageHandle = ()=>{
+    setUserCreationRen(false);
+        settaskCreationRen(false);
+        setTaskDashboardRen(false);
+        setItemrenderer(true);
   }
    
   return (
@@ -130,7 +139,7 @@ function DashBoard() {
       </div>
       <div>
      {userCreationRen && <UserCreation></UserCreation>}
-       {taskCreationRen && <TaskCreation></TaskCreation>}
+       {taskCreationRen && <TaskCreation mainPageHandle={mainPageHandle} ></TaskCreation>}
        {taskDashboardRen && <TaskDashboard></TaskDashboard>}
      </div>
 

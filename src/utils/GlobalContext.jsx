@@ -9,8 +9,14 @@ function GlobalProvider({ children }) {
     setUserRole(role);
   };
 
+  const [userName, setUserName] = useState("");
+
+  const updateUserName = (usrname) => {
+    setUserName(usrname);
+  };
+
   return (
-    <GlobalContext.Provider value={{ userRole, updateGlobalValue }}>
+    <GlobalContext.Provider value={{ userRole, updateGlobalValue ,userName,setUserName}}>
       {children}
     </GlobalContext.Provider>
   );

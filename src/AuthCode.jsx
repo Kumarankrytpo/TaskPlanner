@@ -7,11 +7,12 @@ import "react-toastify/dist/ReactToastify.css";
 
 function AuthCode(props) {
   const { state } = useLocation();
-  const { updateGlobalValue } = useContext(GlobalContext);
+  const { updateGlobalValue,updateUserName } = useContext(GlobalContext);
   const userData = JSON.parse(JSON.stringify(state));
   const [authcode, setAuthCode] = useState("");
   const navigation = useNavigate();
   useEffect(()=>{
+    console.log("first time");
     authcodeIntiation(userData,navigation);
   },[])
   const validate = () => {
@@ -49,6 +50,7 @@ function AuthCode(props) {
            sessionStorage.setItem("accesstoken",data.accesstoken);
          }else if (respData.status === "success") {
           updateGlobalValue(userData.role);
+          
           navigation("/dashboard");
         } else {
           toast.error("Code Mismatch");
