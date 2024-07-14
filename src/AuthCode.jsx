@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 function AuthCode(props) {
   const { state } = useLocation();
-  const { updateGlobalValue,updateUserName } = useContext(GlobalContext);
+  const { updateGlobalValue} = useContext(GlobalContext);
   const userData = JSON.parse(JSON.stringify(state));
   const [authcode, setAuthCode] = useState("");
   const navigation = useNavigate();

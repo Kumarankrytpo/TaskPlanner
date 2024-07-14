@@ -11,7 +11,7 @@ function Login() {
   const[username,setLoginUserName] = useState("");
   const[password,setLoginPassword] = useState("");
   const navigation = useNavigate();
-  const {setUserName} = useContext(GlobalContext);
+  const {setUserName,updateempCode} = useContext(GlobalContext);
 
 
   useEffect(()=>{
@@ -55,6 +55,7 @@ function Login() {
             sessionStorage.setItem("username",respData.username);
             toast.success('Login Successful');
             setUserName(username);
+            updateempCode(respData.empcode);
             navigation("/authcode",{
               state : {
                 emailid : respData.emailid,

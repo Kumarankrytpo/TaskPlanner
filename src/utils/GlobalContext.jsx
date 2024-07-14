@@ -15,8 +15,15 @@ function GlobalProvider({ children }) {
     setUserName(usrname);
   };
 
+
+  const [empCode, setempCode] = useState("");
+
+  const updateempCode = (empcode) => {
+    setempCode(empcode);
+  };
+
   return (
-    <GlobalContext.Provider value={{ userRole, updateGlobalValue ,userName,setUserName}}>
+    <GlobalContext.Provider value={{ userRole, updateGlobalValue ,userName,setUserName,empCode,updateempCode}}>
       {children}
     </GlobalContext.Provider>
   );

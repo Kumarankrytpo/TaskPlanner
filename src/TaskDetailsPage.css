@@ -1,0 +1,14 @@
+.task-col {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensures each column takes full height */
+  }
+  
+  .ant-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Ensures each card takes full height */
+  }
+  

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Button,
   Stepper,
@@ -15,79 +15,72 @@ import {
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { DatePicker } from "antd";
-import { useEffect } from "react";
 import { GlobalContext } from "./utils/GlobalContext";
 import { useNavigate } from "react-router-dom";
-import { Input } from 'antd';
-import {Dashboard} from "./dashboard";
+import { Input } from "antd";
 
 const { TextArea } = Input;
 
 const steps = ["Task Details", "Subtasks", "Deadline", "Summary"];
 
-const TaskCreation = ({mainPageHandle}) => {
+const TaskCreation = ({ mainPageHandle }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [taskName, setTaskName] = useState("");
   const [subTaskCount, setSubTaskCount] = useState(0);
   const [deadline, setDeadline] = useState(null);
-  const [subtasks, setSubtasks] = useState([{ subtaskheader: "" }]);
+  const [subtasks, setSubtasks] = useState([{ subtaskheader: "", subtaskDeadline: null }]);
   const [selectedOptions, setSelectedOptions] = useState([]); // State for multiple selections
   const [options, setOptions] = useState([]);
   const { userName } = useContext(GlobalContext);
   const navigation = useNavigate();
-  const [taskNameError, setTaskNameError] = useState('');
-const [subTaskCountError, setSubTaskCountError] = useState('');
-const [deadlineError, setDeadlineError] = useState('');
-
+  const [taskNameError, setTaskNameError] = useState("");
+  const [subTaskCountError, setSubTaskCountError] = useState("");
+  const [deadlineError, setDeadlineError] = useState("");
 
   const handleNext = () => {
     let valid = true;
-  
+
     if (activeStep === 0) {
       if (!taskName) {
-        setTaskNameError('Task Name is required');
+        setTaskNameError("Task Name is required");
         valid = false;
       } else {
-        setTaskNameError('');
+        setTaskNameError("");
       }
-    }else if (activeStep === 2) {
+    } else if (activeStep === 2) {
       if (!deadline) {
-        setDeadlineError('Deadline is required');
+        setDeadlineError("Deadline is required");
         valid = false;
       } else {
-        setDeadlineError('');
+        setDeadlineError("");
       }
     }
-  
-    if(activeStep===3){
-      console.log(options)
-       const taskdetails = {
-        subject : taskName,
-        assignee : options,
-        reportto : userName,
-        deadline : deadline,
-        subtopicount : subTaskCount,
-        subtask : subtasks
-       }
-       savetaskdetails(taskdetails).then(()=>{
+
+    if (activeStep === 3) {
+      console.log(options);
+      const taskdetails = {
+        subject: taskName,
+        assignee: selectedOptions,
+        reportto: userName,
+        deadline: deadline,
+        subtopicount: subTaskCount,
+        subtask: subtasks,
+      };
+      savetaskdetails(taskdetails).then(() => {
         mainPageHandle();
-       }); 
-       
-    }else{
+      });
+    } else {
       if (valid) {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
     }
-
-
-    
   };
-  const handleBack = () =>
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
 
-  const handleSubtaskChange = (index, value) => {
+  const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
+
+  const handleSubtaskChange = (index, field, value) => {
     const newSubtasks = [...subtasks];
-    newSubtasks[index].subtaskheader = value;
+    newSubtasks[index][field] = value;
     setSubtasks(newSubtasks);
   };
 
@@ -126,7 +119,11 @@ const [deadlineError, setDeadlineError] = useState('');
           navigation("/");
         } else if (respData.status === "tokenrefreshed") {
           sessionStorage.removeItem("accesstoken");
-          sessionStorage.setItem("accesstoken", data.accesstoken);
+          sessionStorage.setItem("accesstoken", data.token);
+          console.log(
+            "session storge accesstocken refreshed ",
+            sessionStorage.getItem("accesstoken")
+          );
         } else if (respData.status === "success") {
           const userList = data.userlist.myArrayList; // Extract the array
           if (Array.isArray(userList)) {
@@ -141,12 +138,11 @@ const [deadlineError, setDeadlineError] = useState('');
         console.log("Error in API", e);
       });
   }, []);
-  const addSubtask = () => setSubtasks([...subtasks, { subtaskheader: "" }]);
+
+  const addSubtask = () => setSubtasks([...subtasks, { subtaskheader: "", subtaskDeadline: null }]);
 
   return (
-    <Box
-      sx={{ display: "flex", flexDirection: "column", minHeight: "70vh", p: 3 }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "70vh", p: 3 }}>
       <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
         {steps.map((label) => (
           <Step key={label}>
@@ -154,7 +150,7 @@ const [deadlineError, setDeadlineError] = useState('');
           </Step>
         ))}
       </Stepper>
-  
+
       <Box sx={{ flex: 1, overflowY: "auto", mb: 2 }}>
         {activeStep === 0 && (
           <>
@@ -192,17 +188,19 @@ const [deadlineError, setDeadlineError] = useState('');
               )}
             </FormControl>
             {subtasks.map((subtask, index) => (
-              <Box
-                key={index}
-                sx={{ display: "flex", alignItems: "center", mb: 2 }}
-              >
+              <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <TextField
                   label={`Subtask ${index + 1}`}
                   variant="outlined"
                   fullWidth
                   value={subtask.subtaskheader}
-                  onChange={(e) => handleSubtaskChange(index, e.target.value)}
+                  onChange={(e) => handleSubtaskChange(index, "subtaskheader", e.target.value)}
                   sx={{ flex: 1 }}
+                />
+                <DatePicker
+                  showTime
+                  onChange={(value) => handleSubtaskChange(index, "subtaskDeadline", value)}
+                  style={{ marginLeft: 16, flex: 1 }}
                 />
                 <Button
                   onClick={() => handleRemoveSubtask(index)}
@@ -240,11 +238,7 @@ const [deadlineError, setDeadlineError] = useState('');
                 </li>
               )}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Select Options"
-                  variant="outlined"
-                />
+                <TextField {...params} label="Select Options" variant="outlined" />
               )}
               sx={{ mb: 2, width: "100%" }}
             />
@@ -268,22 +262,29 @@ const [deadlineError, setDeadlineError] = useState('');
           </Box>
         )}
         {activeStep === 3 && (
-             <div style={{ display: 'flex', justifyContent: 'center' }}> {/* Center the Box */}
-             <Box component="section" sx={{ p: 2, border: '1px dashed grey' }}>
-               <Typography variant="h6">Summary</Typography>
-               <Typography>Task Name: {taskName}</Typography>
-               <Typography>Subtasks: {subTaskCount}</Typography>
-               <Typography>
-                 Deadline: {deadline ? deadline.format('YYYY-MM-DD HH:mm:ss') : ""}
-               </Typography>
-               <Typography>
-                 Selected Options: {selectedOptions.map(option => option.value).join(", ")}
-               </Typography>
-             </Box>
-           </div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            {" "}
+            {/* Center the Box */}
+            <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+              <Typography variant="h6">Summary</Typography>
+              <Typography>Task Name: {taskName}</Typography>
+              <Typography>Subtasks: {subTaskCount}</Typography>
+              <Typography>
+                Deadline: {deadline ? deadline.format("YYYY-MM-DD HH:mm:ss") : ""}
+              </Typography>
+              <Typography>
+                Selected Options: {selectedOptions.map((option) => option.value).join(", ")}
+              </Typography>
+              {subtasks.map((subtask, index) => (
+                <Typography key={index}>
+                  Subtask {index + 1} Deadline: {subtask.subtaskDeadline ? subtask.subtaskDeadline.format("YYYY-MM-DD HH:mm:ss") : "No Deadline"}
+                </Typography>
+              ))}
+            </Box>
+          </div>
         )}
       </Box>
-  
+
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Button disabled={activeStep === 0} onClick={handleBack}>
           Back
@@ -292,7 +293,7 @@ const [deadlineError, setDeadlineError] = useState('');
           {activeStep === steps.length - 1 ? "Finish" : "Next"}
         </Button>
       </Box>
-  
+
       <LinearProgress
         variant="determinate"
         value={(activeStep / (steps.length - 1)) * 100}
@@ -300,50 +301,51 @@ const [deadlineError, setDeadlineError] = useState('');
       />
     </Box>
   );
-}
-  
+};
 
 export default TaskCreation;
 
-function savetaskdetails(taskdetails){
+function savetaskdetails(taskdetails) {
   return fetch("http://localhost:8080/webapi/auth/saveTaskDetails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        taskdata: taskdetails,
-        Accesstoken: sessionStorage.getItem("accesstoken"),
-        RefreshToken: sessionStorage.getItem("refreshtoken"),
-        username: sessionStorage.getItem("username"),
-      }),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      taskdata: taskdetails,
+      Accesstoken: sessionStorage.getItem("accesstoken"),
+      RefreshToken: sessionStorage.getItem("refreshtoken"),
+      username: sessionStorage.getItem("username"),
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const respData = JSON.parse(JSON.stringify(data));
-        console.log("Status >>", respData);
-        if (respData.status === "sessionexpired") {
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.removeItem("refreshtoken");
-          sessionStorage.removeItem("username");
-
-        } else if (respData.status === "tokenrefreshed") {
-          console.log("data acc",data.accesstoken);
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.setItem("accesstoken", data.token);
-          console.log("session storge accesstocken refreshed ",sessionStorage.getItem("accesstoken"))
-        } else if (respData.status === "success") {
-          console.log("inside success methd");
-        }
-      })
-      .catch((e) => {
-        console.log("Error in API", e);
-        
-      });
+    .then((data) => {
+      const respData = JSON.parse(JSON.stringify(data));
+      console.log("Status >>", respData);
+      if (respData.status === "sessionexpired") {
+        sessionStorage.removeItem("accesstoken");
+        sessionStorage.removeItem("refreshtoken");
+        sessionStorage.removeItem("username");
+      } else if (respData.status === "tokenrefreshed") {
+        console.log("data acc", data.token);
+        sessionStorage.removeItem("accesstoken");
+        sessionStorage.setItem("accesstoken", data.token);
+        console.log(
+          "session storge accesstocken refreshed ",
+          sessionStorage.getItem("accesstoken")
+        );
+        savetaskdetails(taskdetails);
+      } else if (respData.status === "success") {
+        console.log("inside success methd");
+      }
+    })
+    .catch((e) => {
+      console.log("Error in API", e);
+    });
 }

@@ -72,7 +72,7 @@ const getuserlist = async (navigation, userName) => {
   return userlist;
 };
 
-function UserCreation({ setCurrent, setUserCreationRen }) {
+function UserCreation({ mainPageHandle}) {
   const navigation = useNavigate();
   const [activeTab, setActiveTab] = useState("1");
   const [firstname, setFirstName] = useState("");
@@ -176,11 +176,17 @@ function UserCreation({ setCurrent, setUserCreationRen }) {
     console.log("JSON <>>>", JSON.stringify(saveData));
     fetch("http://localhost:8080/webapi/auth/usercreation", {
       method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+        userdetails : saveData
+      }),
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-      },
-      body: JSON.stringify(saveData),
+      }
     })
       .then((response) => {
         if (!response.ok) {
@@ -189,18 +195,29 @@ function UserCreation({ setCurrent, setUserCreationRen }) {
         return response.json();
       })
       .then((data) => {
-        console.log("SSSSS", data);
-        const resp = JSON.parse(JSON.stringify(data));
-        console.log("RESPOEN");
-        console.log("response >>", resp);
-        if (resp.status === "success") {
+        const respData = JSON.parse(JSON.stringify(data));
+        console.log("EMPD CODE API", respData);
+        if (respData.status === "sessionexpired") {
+          sessionStorage.removeItem("accesstoken");
+          sessionStorage.removeItem("refreshtoken");
+          sessionStorage.removeItem("username");
+          navigation("/");
+        } else if (respData.status === "tokenrefreshed") {
+          sessionStorage.removeItem("accesstoken");
+          sessionStorage.setItem("accesstoken", data.token);
+          console.log(
+            "session storge accesstocken refreshed ",
+            sessionStorage.getItem("accesstoken")
+          );
+        } else if (respData.status === "success") {
+        if (respData.status === "success") {
           toast.success("User Created");
-          setUserCreationRen(false);
-          setCurrent("home");
-        } else if (resp.status === "existing user") {
+          mainPageHandle();
+        } else if (respData.status === "existing user") {
           toast.error("User Name Already Exist");
         } else {
           toast.error("User not Created");
+        }
         }
       })
       .catch((exception) => {
