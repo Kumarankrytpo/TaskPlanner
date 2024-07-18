@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useNavigate } from "react-router-dom";
 import { GlobalContext } from "./utils/GlobalContext";
+import Checkbox from '@mui/material/Checkbox';
 
 const { TabPane } = Tabs;
 
@@ -72,7 +73,7 @@ const getuserlist = async (navigation, userName) => {
   return userlist;
 };
 
-function UserCreation({ mainPageHandle}) {
+function UserCreation({ mainPageHandle }) {
   const navigation = useNavigate();
   const [activeTab, setActiveTab] = useState("1");
   const [firstname, setFirstName] = useState("");
@@ -85,7 +86,9 @@ function UserCreation({ mainPageHandle}) {
   const [password, setPassword] = useState("");
   const { userName } = useContext(GlobalContext);
   const [users, SetUsers] = useState([]);
-  const [roles, setRoles] = useState(["Project Manager", "Team Lead"]);
+  const [roles, setRoles] = useState([]);
+  const [isotp,setIsotp] = useState(false);
+  
 
   console.log("aftr useres set .", users);
 
@@ -124,69 +127,6 @@ function UserCreation({ mainPageHandle}) {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-    }).then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const respData = JSON.parse(JSON.stringify(data));
-        console.log("EMPD CODE API", respData);
-        if (respData.status === "sessionexpired") {
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.removeItem("refreshtoken");
-          sessionStorage.removeItem("username");
-          navigation("/");
-        } else if (respData.status === "tokenrefreshed") {
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.setItem("accesstoken", data.token);
-          console.log(
-            "session storge accesstocken refreshed ",
-            sessionStorage.getItem("accesstoken")
-          );
-        } else if (respData.status === "success") {
-          setEmpid("EMP" + respData.empcode);
-          console.log("after empd code >>>"+empid);
-        }
-      })
-      .catch((e) => {
-        console.error("There was a problem with the fetch operation:", e);
-      });
-
-    const fetchUserList = async () => {
-      const users = await getuserlist(navigation, userName);
-      SetUsers(users); // assuming you have a state setter for options
-    };
-
-    fetchUserList();
-  }, []);
-
-  const saveUser = () => {
-    const saveData = {
-      firstname: firstname,
-      lastname: lastname,
-      emailid: emailid,
-      empid: empid,
-      role: role,
-      reportto: reportto,
-      username: username,
-      password: password,
-    };
-    console.log("JSON <>>>", JSON.stringify(saveData));
-    fetch("http://localhost:8080/webapi/auth/usercreation", {
-      method: "POST",
-      body: JSON.stringify({
-        username: userName,
-        Accesstoken: sessionStorage.getItem("accesstoken"),
-        RefreshToken: sessionStorage.getItem("refreshtoken"),
-        username: sessionStorage.getItem("username"),
-        userdetails : saveData
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      }
     })
       .then((response) => {
         if (!response.ok) {
@@ -210,14 +150,86 @@ function UserCreation({ mainPageHandle}) {
             sessionStorage.getItem("accesstoken")
           );
         } else if (respData.status === "success") {
-        if (respData.status === "success") {
-          toast.success("User Created");
-          mainPageHandle();
-        } else if (respData.status === "existing user") {
-          toast.error("User Name Already Exist");
-        } else {
-          toast.error("User not Created");
+          setEmpid("EMP" + respData.empcode);
+          console.log("after empd code >>>" + empid);
         }
+      })
+      .catch((e) => {
+        console.error("There was a problem with the fetch operation:", e);
+      });
+
+    const fetchUserList = async () => {
+      const users = await getuserlist(navigation, userName);
+      SetUsers(users); // assuming you have a state setter for options
+    };
+
+    fetchUserList();
+
+    const getroledetails = async()=>{
+      const roles = await getRoles(userName,navigation);
+      setRoles(roles);
+    }
+
+    getroledetails();
+  }, []);
+
+  const saveUser = () => {
+    const saveData = {
+      firstname: firstname,
+      lastname: lastname,
+      emailid: emailid,
+      empid: empid,
+      role: role,
+      reportto: reportto,
+      username: username,
+      password: password,
+      isotp : isotp
+    };
+    console.log("JSON <>>>", JSON.stringify(saveData));
+    fetch("http://localhost:8080/webapi/auth/usercreation", {
+      method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+        userdetails: saveData,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const respData = JSON.parse(JSON.stringify(data));
+        console.log("EMPD CODE API", respData);
+        if (respData.status === "sessionexpired") {
+          sessionStorage.removeItem("accesstoken");
+          sessionStorage.removeItem("refreshtoken");
+          sessionStorage.removeItem("username");
+          navigation("/");
+        } else if (respData.status === "tokenrefreshed") {
+          sessionStorage.removeItem("accesstoken");
+          sessionStorage.setItem("accesstoken", data.token);
+          console.log(
+            "session storge accesstocken refreshed ",
+            sessionStorage.getItem("accesstoken")
+          );
+        } else if (respData.status === "success") {
+          if (respData.status === "success") {
+            toast.success("User Created");
+            mainPageHandle();
+          } else if (respData.status === "existing user") {
+            toast.error("User Name Already Exist");
+          } else {
+            toast.error("User not Created");
+          }
         }
       })
       .catch((exception) => {
@@ -234,6 +246,11 @@ function UserCreation({ mainPageHandle}) {
   const onSelect = (value) => {
     console.log("Selected:", value);
   };
+
+  const onChangeOtp = (e)=>{
+    setIsotp(e.target.checked);
+    console.log("this is otp",e.target.checked);
+  }
   return (
     <div class="usercreationmain">
       <div>
@@ -294,12 +311,29 @@ function UserCreation({ mainPageHandle}) {
         >
           <div className="user_info_center">
             <h3>Role</h3>
-            <input
-              type="text"
-              name="role"
+            <Autocomplete
               value={role}
-              onChange={inputChange}
-            ></input>
+              onChange={(event, newValue) => {
+                setRole(newValue);
+              }}
+              options={roles}
+              getOptionLabel={(option) => (option ? option.role : "")}
+              isOptionEqualToValue={(option, value) =>
+                option.role === value.role
+              }
+              renderOption={(props, option) => (
+                <li {...props}>{option.role}</li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Options"
+                  variant="outlined"
+                />
+              )}
+              sx={{ mb: 2, width: "100%" }}
+            />
+
             <h3>Reporting To</h3>
 
             <Autocomplete
@@ -363,6 +397,12 @@ function UserCreation({ mainPageHandle}) {
             ></input>
             <br></br>
             <br></br>
+            <label>
+            <Checkbox color="success"  onChange={onChangeOtp}/>
+             Is OTP
+      </label>
+            <br></br>
+            <br></br>
             <button onClick={() => nextTab("2")}>
               <span>{<ArrowLeftOutlined />}</span>Previous
             </button>
@@ -377,3 +417,51 @@ function UserCreation({ mainPageHandle}) {
 }
 
 export default UserCreation;
+
+const getRoles = async (userName,navigation)=>{
+  var roles = [];
+  try{
+    const response = await fetch("http://localhost:8080/webapi/auth/getRoleDetails",{
+      method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if(!response.ok){
+      throw new Error("NO HIT API");
+    }
+
+    const data = await response.json();
+    const respData = JSON.parse(JSON.stringify(data));
+
+    if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+      navigation("/");
+    } else if (respData.status === "tokenrefreshed") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "session storge accesstocken refreshed ",
+        sessionStorage.getItem("accesstoken")
+      );
+    } else if (respData.status === "success") {
+      console.log("After user list API hit >>>", respData.roledetails);
+      if (Array.isArray(respData.roledetails.myArrayList)) {
+        roles = respData.roledetails.myArrayList.map((item) => item.map);
+      }
+    }
+  }catch(e){
+    console.log(e);
+  }
+  return roles;
+}

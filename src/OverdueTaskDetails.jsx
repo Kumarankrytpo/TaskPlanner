@@ -1,52 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import { FaAngleDown, FaCheck } from "react-icons/fa";
 import { DatePicker, Modal, Input, Button } from "antd";
 import './OverdueTaskDetails.css'; // Import your CSS for styling
+import { GlobalContext } from "./utils/GlobalContext";
 
-function getPendingTasks() {
-  const tasks = [
-    {
-      TaskName: "Task 1",
-      Taskid: 1,
-      SubTaskCount: 0,
-      subject : "SUMA",
-      Deadline: "2024-05-13 22:00",
-      RequestRen: false,
-    },
-    {
-      TaskName: "Task 2",
-      Taskid: 2,
-      SubTaskCount: 0,
-      subject : "SUMA",
-      Deadline: "2024-05-13 22:00",
-      RequestRen: false,
-    },
-    {
-      TaskName: "Task 3",
-      Taskid: 3,
-      SubTaskCount: 2,
-      subject : "SUMA",
-      Deadline: "2024-05-13 22:00",
-      Subtaskdetails: [
-        {
-          subtaskheader: "SUBTASK1",
-          subject  : "suma",
-          subtaskid: 1,
-          Deadline: "2024-05-13 22:00",
-          RequestRen: false,
-        },
-        {
-          subtaskheader: "SUBTASK2",
-          subtaskid: 2,
-          subject  : "suma",
-          Deadline: "2024-05-13 22:00",
-          RequestRen: false,
-        },
-      ],
-    },
-  ];
+const getPendingTasks = async (empCode) => {
+  let task = [];
+  try {
+    const response = await fetch("http://localhost:8080/webapi/auth/getPendingTaskDetails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        empcode : empCode,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username")
+      })
+    });
 
-  return tasks;
+    console.log("after hit s")
+    if (!response.ok) {
+      throw new Error("API NOT HIT");
+    }
+
+    const data = await response.json();
+    console.log("data",data);
+    const respData = JSON.parse(JSON.stringify(data));
+    if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+    } else if (respData.status === "tokenrefreshed") {
+      console.log("data acc", data.token);
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "session storge accesstocken refreshed ",
+        sessionStorage.getItem("accesstoken")
+      );
+      await getPendingTasks();
+    } else if (respData.status === "success") {
+      if (Array.isArray(respData.pendingtaskdetails.myArrayList)) {
+        task = respData.pendingtaskdetails.myArrayList.map((item) => {
+          let task = item.map;
+          // Ensure subtasks is always an array
+          if (typeof task.Subtaskdetails === 'object' && 'myArrayList' in task.Subtaskdetails) {
+            task.Subtaskdetails = task.Subtaskdetails.myArrayList.map(subtask => subtask.map);
+          } else {
+            task.Subtaskdetails = [];
+          }
+          console.log("after everything",task);
+          return task;
+        });
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  return task;
 }
 
 function OverdueTaskDetails() {
@@ -58,9 +73,14 @@ function OverdueTaskDetails() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
+  const {empCode}  = useContext(GlobalContext);
 
   useEffect(() => {
-    setTaskDetails(getPendingTasks());
+    const fetchData = async () => {
+      const tasks = await getPendingTasks(empCode);
+      setTaskDetails(tasks);
+    };
+    fetchData();
     setReportTo("Kumaran");
   }, []);
 
@@ -152,14 +172,6 @@ function OverdueTaskDetails() {
                   <button className="action-button">
                     Completed <FaCheck />
                   </button>
-                  {item.RequestRen && (
-                    <div className="date-picker-container">
-                      <DatePicker
-                        showTime={{ format: "HH:mm" }}
-                        format="YYYY-MM-DD HH:mm"
-                      />
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -169,7 +181,6 @@ function OverdueTaskDetails() {
                   <div key={subIndex} className="subtask-item">
                     <h4>Subtask ID: {subtask.subtaskid}</h4>
                     <h4>Subject: {subtask.subject}</h4>
-                    <p>Subtask Header: {subtask.subtaskheader}</p>
                     <p>Deadline: {subtask.Deadline}</p>
                     <div className="subtask-actions">
                       <button className="action-button">
@@ -178,14 +189,6 @@ function OverdueTaskDetails() {
                       <button className="action-button">
                         Completed <FaCheck />
                       </button>
-                      {subtask.RequestRen && (
-                        <div className="date-picker-container">
-                          <DatePicker
-                            showTime={{ format: "HH:mm" }}
-                            format="YYYY-MM-DD HH:mm"
-                          />
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}

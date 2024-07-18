@@ -37,12 +37,12 @@ function addingTabDetails(role) {
       icon: <MdDashboard />,
     },
     {
-      label: "Task Deatils",
+      label: "Task Details",
       key: "taskdetails",
       icon: <MdDashboard />,
     },
     {
-      label: "OverDue Task",
+      label: "Overdue Task",
       key: "overduetask",
       icon: <MdDashboard />,
     },
@@ -78,7 +78,7 @@ function addingTabDetails(role) {
 }
 
 function DashBoard() {
-  const { userRole } = useContext(GlobalContext);
+  const { userRole,empCode,userName } = useContext(GlobalContext);
   const [userCreationRen, setUserCreationRen] = useState(false);
   console.log("USER ROLE >>", userRole);
   const items = useMemo(() => addingTabDetails(userRole));
@@ -91,7 +91,12 @@ function DashBoard() {
   const [overduetaskren, setOverduetaskren] = useState(false);
   const [rolecreationren, setRoleCreationren] = useState(false);
 
+  // State for task details and overdue task details numbers
+  const [taskDetailsNumber, setTaskDetailsNumber] = useState(0);
+  const [overdueTaskNumber, setOverdueTaskNumber] = useState(0);
+
   useEffect(() => {
+    console.log("inside render componenr")
     setMenuitems([
       {
         label: "TASK PLANNER",
@@ -107,6 +112,14 @@ function DashBoard() {
     setUserCreationRen(false);
     settaskCreationRen(false);
     setTaskDashboardRen(false);
+
+    const tasknumbers = async ()=>{
+      const [ongoingTaskNo, overdueTaskNo] = await tasknumber(userName, navigation, empCode);
+    setTaskDetailsNumber(ongoingTaskNo);
+    setOverdueTaskNumber(overdueTaskNo);
+    }
+
+    tasknumbers();
   }, []);
 
   const onClick = (key) => {
@@ -177,6 +190,13 @@ function DashBoard() {
         setOverduetaskren(false);
         setRoleCreationren(false);
         console.log("this is role creation ren",rolecreationren);
+        const tasknumbers = async ()=>{
+          const [ongoingTaskNo, overdueTaskNo] = await tasknumber(userName, navigation, empCode);
+        setTaskDetailsNumber(ongoingTaskNo);
+        setOverdueTaskNumber(overdueTaskNo);
+        }
+    
+        tasknumbers();
       } else if (menulable.key === "logout") {
         logout();
       }
@@ -204,7 +224,7 @@ function DashBoard() {
 
   return (
     <div>
-      <div class="admin_dashboard">
+      <div className="admin_dashboard">
         <Menu
           onClick={menuOnclick}
           selectedKeys={"TASK PLANNER"}
@@ -233,16 +253,27 @@ function DashBoard() {
         )}
       </div>
 
-      <div class="mainOptionContainer">
+      <div className="mainOptionContainer">
         {itemrenderer &&
           items.map((item, index) => {
+            const showNumber =
+              item.key === "taskdetails" || item.key === "overduetask";
+            const number =
+              item.key === "taskdetails"
+                ? taskDetailsNumber
+                : item.key === "overduetask"
+                ? overdueTaskNumber
+                : null;
             return (
               <div
                 className="optionsContainer"
                 key={index}
                 onClick={() => onClick(item.key)}
               >
-                <span class="iconsstyle">{item.icon}</span>
+                <span className="iconsstyle">{item.icon}</span>
+                {showNumber && (
+                  <span className="numberBadge">{number}</span>
+                )}
                 <h5 style={{ marginTop: "20%" }}>{item.label}</h5>
               </div>
             );
@@ -253,3 +284,50 @@ function DashBoard() {
 }
 
 export default DashBoard;
+
+const tasknumber = async (userName,navigation,empCode)=>{
+   var tasknumbers = [];
+   try{
+      const response = await fetch("http://localhost:8080/webapi/auth/getTaskNumbers",{
+        method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+        empcode : empCode
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      });
+
+      if(!response.ok){
+        throw new Error("API NOT HIT");
+      }
+      const data = await response.json();
+      const respData = JSON.parse(JSON.stringify(data));
+      if (respData.status === "sessionexpired") {
+        sessionStorage.removeItem("accesstoken");
+        sessionStorage.removeItem("refreshtoken");
+        sessionStorage.removeItem("username");
+        navigation("/");
+      } else if (respData.status === "tokenrefreshed") {
+        sessionStorage.removeItem("accesstoken");
+        sessionStorage.setItem("accesstoken", data.token);
+        console.log(
+          "session storge accesstocken refreshed ",
+          sessionStorage.getItem("accesstoken")
+        );
+      } else if (respData.status === "success") {
+        console.log("tasko",respData);
+        tasknumbers.push(data.ongoingtaskno, data.overduetaskno);
+        console.log("hii",tasknumbers);
+      }
+   }catch(e){
+    console.log();
+   }
+   console.log("after api",tasknumbers);
+   return tasknumbers;
+}
