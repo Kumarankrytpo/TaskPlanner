@@ -4,6 +4,8 @@ import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { GlobalContext } from './utils/GlobalContext';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 
 function Login() {
@@ -11,7 +13,7 @@ function Login() {
   const[username,setLoginUserName] = useState("");
   const[password,setLoginPassword] = useState("");
   const navigation = useNavigate();
-  const {setUserName,updateempCode} = useContext(GlobalContext);
+  const {setUserName,updateempCode,updateGlobalValue} = useContext(GlobalContext);
 
 
   useEffect(()=>{
@@ -56,13 +58,19 @@ function Login() {
             toast.success('Login Successful');
             setUserName(username);
             updateempCode(respData.empcode);
-            navigation("/authcode",{
-              state : {
-                emailid : respData.emailid,
-                userid : respData.userid,
-                role : respData.role
-              }
-            });
+            updateGlobalValue(respData.role);
+            if(respData.isotp){
+              navigation("/authcode",{
+                state : {
+                  emailid : respData.emailid,
+                  userid : respData.userid,
+                  role : respData.role
+                }
+              });
+            }else{
+              navigation("/dashboard");
+            }
+            
           }else{
             toast.error('Account Not Exists.');
           }
@@ -88,13 +96,15 @@ function Login() {
  <div><ToastContainer position="top-right" reverseOrder={false}/>
     <div class="center">
       <div>   
-      <p>User Name</p>
-      <input type="text" placeholder="username" name='loginusername' value={username} class={inputStyleClas} onChange={onInputChange}></input>
-      <p>Password</p>
-      <input type="password" placeholder="password" name='loginpassword' value={password} class={inputStyleClas} onChange={onInputChange}></input>
+
+      <TextField id="standard-basic" label="Username" variant="standard" name='loginusername' value={username} onChange={onInputChange}/>
+      <br></br>
+      <br></br>
+      <TextField id="standard-basic" label="Password" type='password' variant="standard" name='loginpassword' value={password} onChange={onInputChange}/>
+    
       <br />
       <br />
-      <button type="submit" onClick={validateLogin} >Login</button>
+      <Button variant="contained" color="success" onClick={validateLogin}>Login</Button>
       </div>
     
     </div>

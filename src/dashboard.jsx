@@ -13,6 +13,8 @@ import "./dashboard.css";
 import OverdueTaskDetails from "./OverdueTaskDetails";
 import TaskDetailsPage from "./TaskDetailsPage";
 import RoleCreation from "./RoleCreation";
+import TaskHistory from "./TaskHistory";
+import ExtendRequest from "./ExtendRequest";
 
 function addingTabDetails(role) {
   const items = [
@@ -51,6 +53,16 @@ function addingTabDetails(role) {
       key: "rolecreation",
       icon: <MdDashboard />,
     },
+    {
+      label: "Task History",
+      key: "taskhistory",
+      icon: <MdDashboard />,
+    },
+    {
+      label: "Extend Request",
+      key: "extendrequest",
+      icon: <MdDashboard />,
+    },
   ];
   var filteredItems = [];
   if (role === "Admin") {
@@ -58,9 +70,11 @@ function addingTabDetails(role) {
       (obj) =>
         obj.key !== "tasktab" &&
         obj.key !== "taskdetails" &&
-        obj.key !== "overduetask"
+        obj.key !== "overduetask" &&
+        obj.key !== "taskhistory" &&
+        obj.key !== "extendrequest"
     );
-  } else if (role === "Project Manager") {
+  } else if (role === "Project Manager" || role==="Team Leader") {
     filteredItems = items.filter(
       (obj) => obj.key !== "useradd" && obj.key !== "rolecreation"
     );
@@ -69,7 +83,8 @@ function addingTabDetails(role) {
       (obj) =>
         obj.key !== "taskadd" &&
         obj.key !== "useradd" &&
-        obj.key !== "rolecreation"
+        obj.key !== "rolecreation" &&
+        obj.key !== "extendrequest"
     );
   }
 
@@ -94,6 +109,9 @@ function DashBoard() {
   // State for task details and overdue task details numbers
   const [taskDetailsNumber, setTaskDetailsNumber] = useState(0);
   const [overdueTaskNumber, setOverdueTaskNumber] = useState(0);
+
+  const [taskhistoryren , setTaskhistoryren] = useState(false);
+  const [extendrequestren,setExtendRequestRen] = useState(false);
 
   useEffect(() => {
     console.log("inside render componenr")
@@ -132,6 +150,8 @@ function DashBoard() {
       setTaskdetailsRen(false);
       setOverduetaskren(false);
       setRoleCreationren(false);
+      setTaskhistoryren(false);
+      setExtendRequestRen(false);
     } else if (key === "useradd") {
       setUserCreationRen(true);
       setTaskDashboardRen(false);
@@ -139,6 +159,8 @@ function DashBoard() {
       setTaskdetailsRen(false);
       setOverduetaskren(false);
       setRoleCreationren(false);
+      setTaskhistoryren(false);
+      setExtendRequestRen(false);
     } else if (key === "taskadd") {
       settaskCreationRen(true);
       setUserCreationRen(false);
@@ -146,6 +168,8 @@ function DashBoard() {
       setTaskdetailsRen(false);
       setOverduetaskren(false);
       setRoleCreationren(false);
+      setTaskhistoryren(false);
+      setExtendRequestRen(false);
     } else if (key === "tasktab") {
       settaskCreationRen(false);
       setUserCreationRen(false);
@@ -153,6 +177,8 @@ function DashBoard() {
       setTaskdetailsRen(false);
       setOverduetaskren(false);
       setRoleCreationren(false);
+      setTaskhistoryren(false);
+      setExtendRequestRen(false);
     } else if (key === "overduetask") {
       settaskCreationRen(false);
       setUserCreationRen(false);
@@ -160,6 +186,8 @@ function DashBoard() {
       setTaskdetailsRen(false);
       setOverduetaskren(true);
       setRoleCreationren(false);
+      setTaskhistoryren(false);
+      setExtendRequestRen(false);
     } else if (key === "taskdetails") {
       settaskCreationRen(false);
       setUserCreationRen(false);
@@ -167,6 +195,8 @@ function DashBoard() {
       setTaskdetailsRen(true);
       setOverduetaskren(false);
       setRoleCreationren(false);
+      setTaskhistoryren(false);
+      setExtendRequestRen(false);
     } else if (key === "rolecreation") {
       settaskCreationRen(false);
       setUserCreationRen(false);
@@ -174,6 +204,26 @@ function DashBoard() {
       setTaskdetailsRen(false);
       setOverduetaskren(false);
       setRoleCreationren(true);
+      setTaskhistoryren(false);
+      setExtendRequestRen(false);
+    }else if (key === "taskhistory") {
+      settaskCreationRen(false);
+      setUserCreationRen(false);
+      setTaskDashboardRen(false);
+      setTaskdetailsRen(false);
+      setOverduetaskren(false);
+      setRoleCreationren(false);
+      setTaskhistoryren(true);
+      setExtendRequestRen(false);
+    }else if (key === "extendrequest") {
+      settaskCreationRen(false);
+      setUserCreationRen(false);
+      setTaskDashboardRen(false);
+      setTaskdetailsRen(false);
+      setOverduetaskren(false);
+      setRoleCreationren(false);
+      setTaskhistoryren(false);
+      setExtendRequestRen(true);
     }
   };
 
@@ -189,6 +239,8 @@ function DashBoard() {
         setItemrenderer(true);
         setOverduetaskren(false);
         setRoleCreationren(false);
+        setTaskhistoryren(false);
+        setExtendRequestRen(false);
         console.log("this is role creation ren",rolecreationren);
         const tasknumbers = async ()=>{
           const [ongoingTaskNo, overdueTaskNo] = await tasknumber(userName, navigation, empCode);
@@ -250,6 +302,12 @@ function DashBoard() {
         )}
         {rolecreationren && (
           <RoleCreation mainPageHandle={mainPageHandle}></RoleCreation>
+        )}
+        {taskhistoryren && (
+          <TaskHistory mainPageHandle={mainPageHandle}></TaskHistory>
+        )}
+        {extendrequestren && (
+          <ExtendRequest></ExtendRequest>
         )}
       </div>
 

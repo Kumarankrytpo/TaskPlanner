@@ -21,11 +21,12 @@ const TaskDetailsPage = ({ mainPageHandle }) => {
     setCurrentPage(page);
   };
 
+  const fetchTaskDetails = async () => {
+    const taskdetails = await getTaskdetails(empCode, navigation, userName);
+    setTasks(taskdetails);
+  };
+
   useEffect(() => {
-    const fetchTaskDetails = async () => {
-      const taskdetails = await getTaskdetails(empCode, navigation, userName);
-      setTasks(taskdetails);
-    };
     fetchTaskDetails();
   }, [empCode, navigation, userName]);
 
@@ -40,7 +41,7 @@ const TaskDetailsPage = ({ mainPageHandle }) => {
       <Row gutter={[16, 16]}>
         {tasksToShow.map(task => (
           <Col span={6} key={task.taskid} className="task-col">
-            <TaskDetailsCard task={task} />
+            <TaskDetailsCard task={task} fetchTaskDetails={fetchTaskDetails}/>
           </Col>
         ))}
       </Row>

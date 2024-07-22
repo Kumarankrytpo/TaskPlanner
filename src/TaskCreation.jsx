@@ -36,6 +36,7 @@ const TaskCreation = ({ mainPageHandle }) => {
   const [taskNameError, setTaskNameError] = useState("");
   const [subTaskCountError, setSubTaskCountError] = useState("");
   const [deadlineError, setDeadlineError] = useState("");
+  const [summary,setSummary] = useState("");
 
   const handleNext = () => {
     let valid = true;
@@ -65,6 +66,7 @@ const TaskCreation = ({ mainPageHandle }) => {
         deadline: deadline,
         subtopicount: subTaskCount,
         subtask: subtasks,
+        summary : summary
       };
       savetaskdetails(taskdetails).then(() => {
         mainPageHandle();
@@ -141,6 +143,9 @@ const TaskCreation = ({ mainPageHandle }) => {
 
   const addSubtask = () => setSubtasks([...subtasks, { subtaskheader: "", subtaskDeadline: null }]);
 
+  const summaryChange = (e)=>{
+    setSummary(e.target.value);
+  }
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "70vh", p: 3 }}>
       <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
@@ -154,6 +159,7 @@ const TaskCreation = ({ mainPageHandle }) => {
       <Box sx={{ flex: 1, overflowY: "auto", mb: 2 }}>
         {activeStep === 0 && (
           <>
+          <br></br>
             <TextField
               label="Task Name"
               variant="outlined"
@@ -163,7 +169,9 @@ const TaskCreation = ({ mainPageHandle }) => {
               error={!!taskNameError}
               helperText={taskNameError}
             />
-            <TextArea rows={4} placeholder="maxLength is 6" maxLength={6} />
+            <br></br>
+            <br></br>
+            <TextArea rows={4} value={summary} onChange={summaryChange} placeholder="maxLength is 500" maxLength={500} />
           </>
         )}
         {activeStep === 1 && (
