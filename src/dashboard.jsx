@@ -68,11 +68,9 @@ function addingTabDetails(role) {
   if (role === "Admin") {
     filteredItems = items.filter(
       (obj) =>
-        obj.key !== "tasktab" &&
         obj.key !== "taskdetails" &&
         obj.key !== "overduetask" &&
-        obj.key !== "taskhistory" &&
-        obj.key !== "extendrequest"
+        obj.key !== "taskhistory" 
     );
   } else if (role === "Project Manager" || role==="Team Leader") {
     filteredItems = items.filter(
@@ -84,7 +82,8 @@ function addingTabDetails(role) {
         obj.key !== "taskadd" &&
         obj.key !== "useradd" &&
         obj.key !== "rolecreation" &&
-        obj.key !== "extendrequest"
+        obj.key !== "extendrequest" &&
+        obj.key !== "tasktab"
     );
   }
 

@@ -1,5 +1,5 @@
 import "./usercreation.css";
-import { Tabs } from "antd";
+import { Tabs ,Input} from "antd";
 import {
   UserOutlined,
   SolutionOutlined,
@@ -88,6 +88,7 @@ function UserCreation({ mainPageHandle }) {
   const [users, SetUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [isotp,setIsotp] = useState(false);
+  const [reporttoempid,setReporttoempid] = useState("");
   
 
   console.log("aftr useres set .", users);
@@ -183,7 +184,8 @@ function UserCreation({ mainPageHandle }) {
       reportto: reportto,
       username: username,
       password: password,
-      isotp : isotp
+      isotp : isotp,
+      reporttoempid : reporttoempid
     };
     console.log("JSON <>>>", JSON.stringify(saveData));
     fetch("http://localhost:8080/webapi/auth/usercreation", {
@@ -268,31 +270,31 @@ function UserCreation({ mainPageHandle }) {
         >
           <div className="user_info_center">
             <h3>First Name</h3>
-            <input
+            <Input
               type="text"
               name="firstname"
               value={firstname}
               onChange={inputChange}
-            ></input>
+            ></Input>
             <h3>Last Name</h3>
-            <input
+            <Input
               type="text"
               name="lastname"
               value={lastname}
               onChange={inputChange}
-            ></input>
+            ></Input>
             <h3>Email</h3>
-            <input
+            <Input
               type="email"
               name="emailid"
               value={emailid}
               onChange={inputChange}
-            ></input>
+            ></Input>
             <h3>Employee Id</h3>
-            <input type="text" disabled={true} value={empid}></input>
+            <Input type="text" disabled={true} value={empid}></Input>
             <br></br>
             <br></br>
-            <button type="button" onClick={() => nextTab("2")}>
+            <button type="button" onClick={() => nextTab("2")} style={{ marginLeft: "10px" }}>
               Next
               <span>
                 <ArrowRightOutlined />
@@ -339,7 +341,9 @@ function UserCreation({ mainPageHandle }) {
             <Autocomplete
               value={reportto}
               onChange={(event, newValue) => {
+                console.log(event," afasfasd",newValue);
                 setReportTo(newValue);
+                setReporttoempid(newValue.empid)
               }}
               options={users}
               getOptionLabel={(option) => (option ? option.name : "")}
@@ -366,7 +370,7 @@ function UserCreation({ mainPageHandle }) {
             <button onClick={() => nextTab("1")}>
               <span>{<ArrowLeftOutlined />}</span>Previous
             </button>
-            <button onClick={() => nextTab("3")}>
+            <button onClick={() => nextTab("3")} style={{ marginLeft: "10px" }}>
               Next<span>{<ArrowRightOutlined />}</span>
             </button>
           </div>
@@ -382,19 +386,19 @@ function UserCreation({ mainPageHandle }) {
         >
           <div className="user_info_center">
             <h3>User Name</h3>
-            <input
+            <Input
               type="text"
               name="username"
               value={username}
               onChange={inputChange}
-            ></input>
+            ></Input>
             <h3>Password</h3>
-            <input
+            <Input
               type="password"
               name="password"
               value={password}
               onChange={inputChange}
-            ></input>
+            ></Input>
             <br></br>
             <br></br>
             <label>
@@ -403,10 +407,10 @@ function UserCreation({ mainPageHandle }) {
       </label>
             <br></br>
             <br></br>
-            <button onClick={() => nextTab("2")}>
+            <button onClick={() => nextTab("2")} >
               <span>{<ArrowLeftOutlined />}</span>Previous
             </button>
-            <button onClick={saveUser}>
+            <button onClick={saveUser} style={{ marginLeft: "10px" }}>
               Submit<span>{<CheckCircleOutlined />}</span>
             </button>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useContext} from "react";
 import {
   BarChart,
   Bar,
@@ -8,11 +8,18 @@ import {
   Tooltip,
   ResponsiveContainer,
   LineChart,
-  Line
+  Line,
 } from "recharts";
 import { PieChart, Pie, Cell, Tooltip as PieTooltip } from "recharts";
 import { AreaChart, Area } from "recharts";
-import './TaskDashboard.css';
+import { Cascader } from "antd";
+import { useNavigate } from "react-router-dom";
+import { GlobalContext } from "./utils/GlobalContext";
+import "./TaskDashboard.css";
+
+const onChange = (value) => {
+  console.log(value);
+};
 
 const weeklyData = [
   [
@@ -115,6 +122,9 @@ const TaskDashboard = () => {
   const [currentMonth, setCurrentMonth] = useState("JAN");
   const [selectedOption, setSelectedOption] = useState("Option 1");
   const [selectedMember, setSelectedMember] = useState("Member 1");
+  const [barchart,setBarChart] = useState([]);
+  const {empCode,userName}  = useContext(GlobalContext);
+  const navigation = useNavigate();
 
   useEffect(() => {
     console.log(`Rendering week ${currentWeek + 1}`);
@@ -142,10 +152,22 @@ const TaskDashboard = () => {
     setSelectedMember(event.target.value);
   };
 
-  const memberData = Object.entries(areaData[0][selectedMember]).map(([month, tasks]) => ({
-    month,
-    tasks,
-  }));
+  useEffect(()=>{
+    const barchart =async ()=>{
+      const barchartarr =await getBarChartDetails(empCode,userName,navigation);
+      setBarChart(transformData(barchartarr));
+    }
+    barchart();
+  },[]);
+
+  const displayRender = (labels) => labels[labels.length - 1];
+
+  const memberData = Object.entries(areaData[0][selectedMember]).map(
+    ([month, tasks]) => ({
+      month,
+      tasks,
+    })
+  );
 
   return (
     <div className="task-chart-container">
@@ -160,22 +182,13 @@ const TaskDashboard = () => {
               alignItems: "center",
             }}
           >
-            <select
-              value={selectedOption}
-              onChange={handleSelectChange}
-              style={{
-                backgroundColor: "#e94560",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "5px",
-                padding: "5px",
-                cursor: "pointer",
-              }}
-            >
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-            </select>
+            <Cascader
+              options={barchart}
+              expandTrigger="hover"
+              displayRender={displayRender}
+              onChange={onChange}
+              className="custom-cascader"
+            />
           </div>
           <div
             style={{
@@ -229,7 +242,7 @@ const TaskDashboard = () => {
             </button>
           </div>
           <div className="chart-container">
-            <ResponsiveContainer className={'chart-container'}>
+            <ResponsiveContainer className={"chart-container"}>
               <BarChart
                 data={weeklyData[currentWeek]}
                 margin={{ top: 50, right: 30, left: 0, bottom: 5 }}
@@ -248,7 +261,7 @@ const TaskDashboard = () => {
         </div>
 
         <div className="chart-column">
-        <div
+          <div
             style={{
               display: "flex",
               justifyContent: "center",
@@ -260,8 +273,7 @@ const TaskDashboard = () => {
                 key={month}
                 onClick={() => setCurrentMonth(month)}
                 style={{
-                  backgroundColor:
-                    currentMonth === month ? "#e94560" : "#333",
+                  backgroundColor: currentMonth === month ? "#e94560" : "#333",
                   color: "#ffffff",
                   border: "none",
                   borderRadius: "5px",
@@ -274,7 +286,7 @@ const TaskDashboard = () => {
               </button>
             ))}
           </div>
-          <ResponsiveContainer className={'chart-container'}>
+          <ResponsiveContainer className={"chart-container"}>
             <PieChart>
               <Pie
                 dataKey="value"
@@ -289,9 +301,14 @@ const TaskDashboard = () => {
                   `${name} ${(percent * 100).toFixed(0)}%`
                 }
               >
-                {Object.entries(monthlyData[currentMonth]).map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
+                {Object.entries(monthlyData[currentMonth]).map(
+                  (entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  )
+                )}
               </Pie>
               <PieTooltip
                 contentStyle={{ backgroundColor: "#2c2c54", border: "none" }}
@@ -329,7 +346,7 @@ const TaskDashboard = () => {
               <option value="Member 4">Member 4</option>
             </select>
           </div>
-          <ResponsiveContainer className={'chart-container'}>
+          <ResponsiveContainer className={"chart-container"}>
             <AreaChart data={memberData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="month" tick={{ fill: "#ccc" }} />
@@ -351,7 +368,10 @@ const TaskDashboard = () => {
 
       <div className="full-width-chart">
         <ResponsiveContainer>
-          <LineChart data={multiLineData} margin={{ top: 50, right: 30, left: 0, bottom: 5 }}>
+          <LineChart
+            data={multiLineData}
+            margin={{ top: 50, right: 30, left: 0, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis dataKey="name" tick={{ fill: "#ccc" }} />
             <YAxis tick={{ fill: "#ccc" }} />
@@ -371,3 +391,71 @@ const TaskDashboard = () => {
 };
 
 export default TaskDashboard;
+
+const getBarChartDetails =async (empCode,userName,navigation)=>{
+   var barchart = [];
+   var weekcount = {};
+   try{
+     const response = await fetch("http://localhost:8080/webapi/auth/getBarChartDetails",{
+      method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        empcode: empCode,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+     });
+
+     if(!response.ok){
+       throw new Error("API Not Hit");
+     }
+
+     const data = await response.json();
+     const respData = JSON.parse(JSON.stringify(data));
+     if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+      navigation("/");
+    } else if (respData.status === "tokenrefreshed") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "Session storage accesstoken refreshed",
+        sessionStorage.getItem("accesstoken")
+      );
+    } else if (respData.status === "success") {
+      return respData;
+    }
+     
+   }catch(e){
+    console.log(e);
+   }
+   console.log("IN API ",barchart,weekcount);
+   return barchart,weekcount;
+}
+
+const transformData = (data) => {
+  return data.arr.myArrayList.map(member => {
+    return {
+      value: member.map.value,
+      label: member.map.label,
+      children: member.map.children.myArrayList.map(year => {
+        return {
+          value: year.map.value,
+          label: year.map.label,
+          children: year.map.children.myArrayList.map(month => {
+            return {
+              value: month.map.value,
+              label: month.map.label
+            };
+          })
+        };
+      })
+    };
+  });
+};

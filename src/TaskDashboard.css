@@ -12,7 +12,7 @@
     justify-content: space-between;
     flex: 1;
     overflow: hidden;
-    margin-bottom: 10px;
+    margin-bottom: -5px;
   }
   
   .chart-column {
@@ -24,16 +24,17 @@
     color: #ffffff;
     position: relative;
     box-sizing: border-box;
+    height : 90%;
   }
   
   .full-width-chart {
     width: 100%;
-    height: 60%;
+    height: 50%;
     background-color: #1a1a2e;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     color: #ffffff;
-    margin-top: 10px;
+    margin-bottom: 40px;
     overflow: hidden;
     box-sizing: border-box;
   }
@@ -43,4 +44,19 @@
     width : 100%;
     margin-top: 20px;
   }
+
+  .custom-cascader .ant-select-selector {
+    background-color: #e94560 !important;
+    color: #ffffff;
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 2px !important;
+    cursor: pointer;
+    width: 10%;
+  }
+
+  .ant-cascader {
+    width: 100px;
+  }
+  
   
