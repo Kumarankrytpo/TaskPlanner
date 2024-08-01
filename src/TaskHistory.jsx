@@ -4,33 +4,6 @@ import { SearchOutlined } from '@ant-design/icons';
 import { GlobalContext } from './utils/GlobalContext';
 import { useNavigate } from "react-router-dom";
 
-const data = [
-  {
-    taskid: 1,
-    subject: 'Subject 1',
-    deadline: '2024-07-21 10:00',
-    completeddate: '2024-07-20 11:00',
-    subtaskcount: 2,
-    rating: 3,
-  },
-  {
-    taskid: 2,
-    subject: 'Subject 2',
-    deadline: '2024-07-22 11:00',
-    completeddate: '2024-07-21 12:00',
-    subtaskcount: 3,
-    rating: 4,
-  },
-  {
-    taskid: 3,
-    subject: 'Subject 3',
-    deadline: '2024-07-23 12:00',
-    completeddate: '2024-07-22 13:00',
-    subtaskcount: 1,
-    rating: 5,
-  },
-  // Add more data as needed
-];
 
 const TaskHistory = ({mainPageHandle}) => {
   const [filteredData, setFilteredData] = useState([]);
@@ -39,7 +12,7 @@ const TaskHistory = ({mainPageHandle}) => {
   const navigation = useNavigate();
 
   const handleSearch = () => {
-    const filtered = data.filter(item =>
+    const filtered = filteredData.filter(item =>
       item.subject.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilteredData(filtered);

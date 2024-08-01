@@ -35,6 +35,7 @@ const TaskCreation = ({ mainPageHandle }) => {
   const navigation = useNavigate();
   const [taskNameError, setTaskNameError] = useState("");
   const [subTaskCountError, setSubTaskCountError] = useState("");
+  const [deadlinedis,setDeadeLineDis] = useState(false);
   const [deadlineError, setDeadlineError] = useState("");
   const [summary,setSummary] = useState("");
 
@@ -48,6 +49,13 @@ const TaskCreation = ({ mainPageHandle }) => {
       } else {
         setTaskNameError("");
       }
+    }else if(activeStep===1){
+      console.log("INSIDE STEP 1",subtasks);
+      if(subtasks.length>=1 && subtasks[0].subtaskDeadline!==null){
+         setDeadline(subtasks[subtasks.length-1].subtaskDeadline);
+         setDeadeLineDis(true);
+      }
+      console.log(deadline);
     } else if (activeStep === 2) {
       if (!deadline) {
         setDeadlineError("Deadline is required");
@@ -64,7 +72,7 @@ const TaskCreation = ({ mainPageHandle }) => {
         assignee: selectedOptions,
         reportto: userName,
         deadline: deadline,
-        subtopicount: subTaskCount,
+        subtopicount: subtasks[0].subtaskDeadline!==null ? subtasks.length : 0,
         subtask: subtasks,
         summary : summary
       };
@@ -176,25 +184,6 @@ const TaskCreation = ({ mainPageHandle }) => {
         )}
         {activeStep === 1 && (
           <>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Subtask Count</InputLabel>
-              <Select
-                value={subTaskCount}
-                onChange={(e) => setSubTaskCount(e.target.value)}
-                error={!!subTaskCountError}
-              >
-                {[...Array(10).keys()].map((count) => (
-                  <MenuItem key={count} value={count}>
-                    {count}
-                  </MenuItem>
-                ))}
-              </Select>
-              {subTaskCountError && (
-                <Typography color="error" variant="body2">
-                  {subTaskCountError}
-                </Typography>
-              )}
-            </FormControl>
             {subtasks.map((subtask, index) => (
               <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <TextField
@@ -246,17 +235,17 @@ const TaskCreation = ({ mainPageHandle }) => {
                 </li>
               )}
               renderInput={(params) => (
-                <TextField {...params} label="Select Options" variant="outlined" />
+                <TextField {...params} label="Assign To" variant="outlined" />
               )}
               sx={{ mb: 2, width: "100%" }}
             />
             <DatePicker
               showTime
-              onChange={(value, dateString) => {
+              value={deadline}
+              onChange={(value) => {
                 setDeadline(value);
-                console.log("Selected Time: ", value);
-                console.log("Formatted Selected Time: ", dateString);
               }}
+              disabled={deadlinedis}
               onOk={(value) => {
                 console.log("OK Selected Time: ", value);
               }}

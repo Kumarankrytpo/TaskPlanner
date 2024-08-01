@@ -1,8 +1,10 @@
-import React, { useState, useEffect,useContext } from "react";
-import { FaAngleDown, FaCheck } from "react-icons/fa";
-import { DatePicker, Modal, Input, Button } from "antd";
-import './OverdueTaskDetails.css'; // Import your CSS for styling
+import React, { useState, useEffect, useContext } from "react";
+import { FaCheck, FaExclamationCircle } from "react-icons/fa";
+import { DatePicker, Modal, Input, Button, Card, Row, Col, Pagination } from "antd";
+import './OverdueTaskDetails.css';
 import { GlobalContext } from "./utils/GlobalContext";
+
+const { Search } = Input;
 
 const getPendingTasks = async (empCode) => {
   let task = [];
@@ -14,45 +16,36 @@ const getPendingTasks = async (empCode) => {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        empcode : empCode,
+        empcode: empCode,
         Accesstoken: sessionStorage.getItem("accesstoken"),
         RefreshToken: sessionStorage.getItem("refreshtoken"),
         username: sessionStorage.getItem("username")
       })
     });
 
-    console.log("after hit s")
     if (!response.ok) {
       throw new Error("API NOT HIT");
     }
 
     const data = await response.json();
-    console.log("data",data);
     const respData = JSON.parse(JSON.stringify(data));
     if (respData.status === "sessionexpired") {
       sessionStorage.removeItem("accesstoken");
       sessionStorage.removeItem("refreshtoken");
       sessionStorage.removeItem("username");
     } else if (respData.status === "tokenrefreshed") {
-      console.log("data acc", data.token);
       sessionStorage.removeItem("accesstoken");
       sessionStorage.setItem("accesstoken", data.token);
-      console.log(
-        "session storge accesstocken refreshed ",
-        sessionStorage.getItem("accesstoken")
-      );
       await getPendingTasks();
     } else if (respData.status === "success") {
       if (Array.isArray(respData.pendingtaskdetails.myArrayList)) {
         task = respData.pendingtaskdetails.myArrayList.map((item) => {
           let task = item.map;
-          // Ensure subtasks is always an array
           if (typeof task.Subtaskdetails === 'object' && 'myArrayList' in task.Subtaskdetails) {
             task.Subtaskdetails = task.Subtaskdetails.myArrayList.map(subtask => subtask.map);
           } else {
             task.Subtaskdetails = [];
           }
-          console.log("after everything",task);
           return task;
         });
       }
@@ -68,12 +61,13 @@ function OverdueTaskDetails() {
   const [taskDetails, setTaskDetails] = useState([]);
   const [expandedTaskIndex, setExpandedTaskIndex] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [reportTo, setReportTo] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const {empCode}  = useContext(GlobalContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { empCode } = useContext(GlobalContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,8 +75,7 @@ function OverdueTaskDetails() {
       setTaskDetails(tasks);
     };
     fetchData();
-    setReportTo("Kumaran");
-  }, []);
+  }, [empCode]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -92,27 +85,14 @@ function OverdueTaskDetails() {
     return () => clearInterval(interval); // Cleanup on component unmount
   }, []);
 
-  const toggleSubtasks = (index) => {
-    // Toggle the expanded state for the clicked task
-    if (expandedTaskIndex === index) {
-      setExpandedTaskIndex(null);
-    } else {
-      setExpandedTaskIndex(index);
-    }
-  };
-
   const getDeviation = (deadline) => {
     const d1 = currentTime;
     const d2 = new Date(deadline);
 
-    // Calculate the difference in milliseconds
     const diffMs = Math.abs(d1 - d2);
-
-    // Calculate the difference in hours and minutes
     const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
     const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    // Format the result as HH:mm
     const hh = String(diffHrs).padStart(2, "0");
     const mm = String(diffMins).padStart(2, "0");
 
@@ -125,79 +105,96 @@ function OverdueTaskDetails() {
   };
 
   const handleModalOk = () => {
-    // Handle submission logic here
     console.log("Selected Date:", selectedDate);
     console.log("Remarks:", remarks);
 
-    // Close the modal and reset states
     setModalVisible(false);
     setSelectedDate(null);
     setRemarks("");
   };
 
   const handleModalCancel = () => {
-    // Close the modal and reset states
     setModalVisible(false);
     setSelectedDate(null);
     setRemarks("");
   };
 
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
+
+  const filteredTasks = taskDetails.filter((task) => 
+  String(task.Taskid).toLowerCase().includes(searchTerm.toLowerCase()) ||
+  task.subject.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+  const toggleSubtasks = (index) => {
+    if (expandedTaskIndex === index) {
+      setExpandedTaskIndex(null);
+    } else {
+      setExpandedTaskIndex(index);
+    }
+  };
+  
+
+  const tasksPerPage = 12;
+  const paginatedTasks = filteredTasks.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage);
+
   return (
     <div className="overdue-container">
       <h3>Overdue Tasks</h3>
-      <div className="tasks-list">
-        {taskDetails.map((item, index) => (
-          <div key={index} className="task-item">
-            <div className="task-header">
-              <h3>Task ID: {item.Taskid}</h3>
-              <h3>Subject: {item.subject}</h3>
-              <p>Deadline: {item.Deadline}</p>
+      <Search
+        placeholder="Search tasks..."
+        onSearch={handleSearch}
+        style={{ marginBottom: '20px', width: '100%' }}
+      />
+      <Row gutter={[16, 16]}>
+        {paginatedTasks.map((item, index) => (
+          <Col key={index} xs={24} sm={12} md={8} lg={8} xl={4}>
+            <Card
+              title={`Task ID: ${item.Taskid}`}
+              extra={<FaExclamationCircle style={{ color: 'red', fontSize: '18px' }} />}
+              actions={[
+                <Button type="link" onClick={() => showExtendModal(item.Taskid)}>
+                  Extend Request
+                </Button>,
+                <Button type="primary" icon={<FaCheck />}>
+                  Completed
+                </Button>
+              ]}
+            >
+              <p><strong>Subject:</strong> {item.subject}</p>
+              <p><strong>Deadline:</strong> {item.Deadline}</p>
+              <p><strong>Deviation:</strong> {getDeviation(item.Deadline)}</p>
               {item.SubTaskCount !== 0 && (
-                <button
-                  className="toggle-button"
-                  onClick={() => toggleSubtasks(index)}
-                >
-                  <FaAngleDown />
-                </button>
+                <Button type="link" onClick={() => toggleSubtasks(index)}>
+                  {expandedTaskIndex === index ? "Hide Subtasks" : "Show Subtasks"}
+                </Button>
               )}
-              <p>Deviation: {getDeviation(item.Deadline)}</p>
-              {item.SubTaskCount === 0 && (
-                <div className="task-actions">
-                  <button
-                    className="action-button"
-                    onClick={() => showExtendModal(item.Taskid)}
-                  >
-                    Extend Request
-                  </button>
-                  <button className="action-button">
-                    Completed <FaCheck />
-                  </button>
+              {expandedTaskIndex === index && item.Subtaskdetails.length > 0 && (
+                <div className="subtasks-container">
+                  {item.Subtaskdetails.map((subtask, subIndex) => (
+                    <div key={subIndex} className="subtask-item">
+                      <p><strong>Subtask ID:</strong> {subtask.subtaskid}</p>
+                      <p><strong>Subject:</strong> {subtask.subject}</p>
+                      <p><strong>Deadline:</strong> {subtask.Deadline}</p>
+                    </div>
+                  ))}
                 </div>
               )}
-            </div>
-            {expandedTaskIndex === index && item.Subtaskdetails && (
-              <div className="subtasks-container">
-                {item.Subtaskdetails.map((subtask, subIndex) => (
-                  <div key={subIndex} className="subtask-item">
-                    <h4>Subtask ID: {subtask.subtaskid}</h4>
-                    <h4>Subject: {subtask.subject}</h4>
-                    <p>Deadline: {subtask.Deadline}</p>
-                    <div className="subtask-actions">
-                      <button className="action-button">
-                        Extend Request
-                      </button>
-                      <button className="action-button">
-                        Completed <FaCheck />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+            </Card>
+          </Col>
         ))}
-      </div>
-      {/* Extend Request Modal */}
+      </Row>
+      {filteredTasks.length > tasksPerPage && (
+        <Pagination
+          current={currentPage}
+          total={filteredTasks.length}
+          pageSize={tasksPerPage}
+          onChange={page => setCurrentPage(page)}
+          style={{ marginTop: '20px', textAlign: 'center' }}
+        />
+      )}
       <Modal
         title="Extend Task Deadline"
         visible={modalVisible}

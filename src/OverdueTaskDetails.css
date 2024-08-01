@@ -1,63 +1,65 @@
 .overdue-container {
-    padding: 20px;
-  }
-  
-  .tasks-list {
-    margin-top: 10px;
-  }
-  
-  .task-item {
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-  }
-  
-  .task-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .toggle-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .task-actions {
-    margin-top: 10px;
-  }
-  
-  .action-button {
-    margin-right: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  .subtasks-container {
-    margin-top: 10px;
-    padding-left: 20px;
-  }
-  
-  .subtask-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-    padding-left: 20px;
-    column-gap: 30px;
-  }
-  
-  .subtask-actions {
-    margin-left: auto;
-  }
-  
-  .date-picker-container {
-    margin-top: 10px;
-  }
-  
+  padding: 20px;
+  background-color: #f0f2f5;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.task-item {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  transition: transform 0.3s;
+}
+
+.task-item:hover {
+  transform: translateY(-5px);
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.toggle-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.subtasks-container {
+  margin-top: 16px;
+  padding-left: 16px;
+  border-left: 2px solid #e8e8e8;
+}
+
+.subtask-item {
+  background: #fafafa;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.action-button {
+  margin-right: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.action-button:hover {
+  background-color: #e6f7ff;
+}

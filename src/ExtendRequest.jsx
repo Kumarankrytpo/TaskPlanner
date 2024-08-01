@@ -16,12 +16,17 @@ const data = [
       deadline: "2024-07-21 10:00",
       extendeddate: "2024-07-23 10:00",
       subtaskCount: 1,
-      subtaskdetails: {
+      subtaskdetails:[ {
         subtaskid: 1,
         subject: "subtask 1",
         deadline: "2024-07-21 01:00",
         extenddate: "2024-07-22 03:00"
-      }
+      },{
+        subtaskid: 1,
+        subject: "subtask 1",
+        deadline: "2024-07-21 01:00",
+        extenddate: "2024-07-22 03:00"
+      }]
     }
   }
 ];

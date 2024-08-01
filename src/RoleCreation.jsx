@@ -3,6 +3,8 @@ import { Button, TextField, IconButton, Table, TableBody, TableCell, TableContai
 import { Edit as EditIcon, Delete as DeleteIcon, Save as SaveIcon } from '@mui/icons-material';
 import { GlobalContext } from './utils/GlobalContext';
 import { useNavigate } from "react-router-dom";
+import {ToastContainer, toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const getRoleDetails = async (userName, navigation) => {
   var arr = [];
@@ -109,12 +111,13 @@ const RoleCreation = ({ mainPageHandle }) => {
     const fetchData = async () => {
       const roleDetails = await getRoleDetails(userName, navigation);
       setRows(roleDetails);
+      console.log("ROWS>>>",rows);
     };
     fetchData();
   }, [userName, navigation]);
 
   const handleAdd = () => {
-    setRows(prevRows => [...prevRows, { value: inputValue }]);
+    setRows(prevRows => [...prevRows, { role: inputValue }]);
     console.log("ROWS>>",rows);
     setInputValue('');
   };
@@ -138,12 +141,13 @@ const RoleCreation = ({ mainPageHandle }) => {
   const savechange = () => {
     console.log("ROWS>>>",rows);
     saveroles(rows, userName, navigation);
-    mainPageHandle();
+    toast.success('Role Saved');
   }
 
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+      <div><ToastContainer position="top-right" reverseOrder={false}/></div>
         <TextField
           label="Enter Value"
           variant="outlined"
@@ -177,7 +181,7 @@ const RoleCreation = ({ mainPageHandle }) => {
                       variant="outlined"
                     />
                   ) : (
-                    row.value
+                    row.role
                   )}
                 </TableCell>
                 <TableCell align="right">
