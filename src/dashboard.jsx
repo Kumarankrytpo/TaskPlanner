@@ -1,5 +1,5 @@
 import { UserAddOutlined, HomeOutlined } from "@ant-design/icons";
-import { MdDashboard } from "react-icons/md";
+import { MdDashboard,MdDataset ,MdDiversity1,MdAssignmentLate} from "react-icons/md";
 import { Menu } from "antd";
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,11 +19,6 @@ import ExtendRequest from "./ExtendRequest";
 function addingTabDetails(role) {
   const items = [
     {
-      label: "Home",
-      key: "home",
-      icon: <HomeOutlined />,
-    },
-    {
       label: "User Creation",
       key: "useradd",
       icon: <UserAddOutlined />,
@@ -36,7 +31,7 @@ function addingTabDetails(role) {
     {
       label: "Task Dashboard",
       key: "tasktab",
-      icon: <MdDashboard />,
+      icon: <MdDataset />,
     },
     {
       label: "Task Details",
@@ -51,7 +46,7 @@ function addingTabDetails(role) {
     {
       label: "Role Creation",
       key: "rolecreation",
-      icon: <MdDashboard />,
+      icon: <MdDiversity1 />,
     },
     {
       label: "Task History",
@@ -61,7 +56,7 @@ function addingTabDetails(role) {
     {
       label: "Extend Request",
       key: "extendrequest",
-      icon: <MdDashboard />,
+      icon: <MdAssignmentLate />,
     },
   ];
   var filteredItems = [];
@@ -142,16 +137,7 @@ function DashBoard() {
   const onClick = (key) => {
     console.log("click ", key);
     setItemrenderer(false);
-    if (key === "home") {
-      setUserCreationRen(false);
-      settaskCreationRen(false);
-      setTaskDashboardRen(false);
-      setTaskdetailsRen(false);
-      setOverduetaskren(false);
-      setRoleCreationren(false);
-      setTaskhistoryren(false);
-      setExtendRequestRen(false);
-    } else if (key === "useradd") {
+    if (key === "useradd") {
       setUserCreationRen(true);
       setTaskDashboardRen(false);
       settaskCreationRen(false);
@@ -273,9 +259,10 @@ function DashBoard() {
     setRoleCreationren(false);
   };
 
+
   return (
     <div>
-      <div className="admin_dashboard">
+      <div>
         <Menu
           onClick={menuOnclick}
           selectedKeys={"TASK PLANNER"}
@@ -284,6 +271,7 @@ function DashBoard() {
           theme="dark"
           style={{
             boxShadow: 80,
+            backgroundColor : '#282b31'
           }}
         />
       </div>
@@ -323,16 +311,16 @@ function DashBoard() {
                 : null;
             return (
               <div
-                className="optionsContainer"
-                key={index}
-                onClick={() => onClick(item.key)}
-              >
-                <span className="iconsstyle">{item.icon}</span>
-                {showNumber && (
-                  <span className="numberBadge">{number}</span>
-                )}
-                <h5 style={{ marginTop: "20%" }}>{item.label}</h5>
-              </div>
+          className={"optionsContainer"}
+          key={index}
+          onClick={() => onClick(item.key)}
+        >
+          <span className="iconsstyle">{item.icon}</span>
+          {showNumber && (
+            <span className="numberBadge">{number}</span>
+          )}
+          <h5 style={{ marginTop: "20%" }}>{item.label}</h5>
+        </div>
             );
           })}
       </div>

@@ -1,27 +1,64 @@
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing:border-box ;
+}
+
+html,body{
+width: 100%;
+height: 100%;
+}
+
+.appcontainer{
+  width: 100%;
+  height: 100%;
+}
+
 .login_bg {
-  background: url("../public/loginBG.jpg");
+  /* background: url("../public/loginBG.jpg");
   background-size: cover;
-  background-position: center;
-  width: 100vw;
-  height: 100vh;
+  background-position: center; */
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center; /* Horizontally center the .center div */
   align-items: center; /* Vertically center the .center div */
+  background-color: #282b31;
 }
 
 .center {
-  width: 100%;
+  width: 30%;
+  height: 340px;
   text-align: center;
-  padding: 10px;
+  padding: 30px;
+  color: aliceblue;
 
   /* From https://css.glass */
-  background: rgba(255, 255, 255, 0.2);
+  background: #282b31;
   border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 70px rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #282b31;
+  position: absolute;
 }
+
+.uppersvg{
+  border-radius: 16px;
+  box-shadow: 0 4px 70px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid #282b31;
+}
+
+.waveupper{
+  background-color: #282b31;
+  display: block;
+  width: 100%;
+  margin-top: 8%;
+}
+
 
 body {
   margin: 0;

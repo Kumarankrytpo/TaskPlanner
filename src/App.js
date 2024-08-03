@@ -10,7 +10,7 @@ function App() {
   return (
       <GlobalProvider>
         <Router>
-          <div>
+          <div className="appcontainer">
             <Routes>
               <Route element={<ProtectedRoute />}>
                 <Route path="/authcode" element={<AuthCode />} exact />
