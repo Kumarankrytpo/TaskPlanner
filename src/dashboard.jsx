@@ -111,7 +111,7 @@ function DashBoard() {
     console.log("inside render componenr")
     setMenuitems([
       {
-        label: "TASK PLANNER",
+        label: "Krypto Planner",
         key: "maintab",
         icon: <MdDashboard />,
       },
@@ -261,7 +261,7 @@ function DashBoard() {
 
 
   return (
-    <div>
+    <div className="dashboardmain">
       <div>
         <Menu
           onClick={menuOnclick}
@@ -298,32 +298,35 @@ function DashBoard() {
         )}
       </div>
 
+      {!userCreationRen && !taskCreationRen && !taskDashboardRen && !overduetaskren
+      && !taskdetailsren && !taskhistoryren && !extendrequestren &&
       <div className="mainOptionContainer">
-        {itemrenderer &&
-          items.map((item, index) => {
-            const showNumber =
-              item.key === "taskdetails" || item.key === "overduetask";
-            const number =
-              item.key === "taskdetails"
-                ? taskDetailsNumber
-                : item.key === "overduetask"
-                ? overdueTaskNumber
-                : null;
-            return (
-              <div
-          className={"optionsContainer"}
-          key={index}
-          onClick={() => onClick(item.key)}
-        >
-          <span className="iconsstyle">{item.icon}</span>
-          {showNumber && (
-            <span className="numberBadge">{number}</span>
-          )}
-          <h5 style={{ marginTop: "20%" }}>{item.label}</h5>
-        </div>
-            );
-          })}
+      {itemrenderer &&
+        items.map((item, index) => {
+          const showNumber =
+            item.key === "taskdetails" || item.key === "overduetask";
+          const number =
+            item.key === "taskdetails"
+              ? taskDetailsNumber
+              : item.key === "overduetask"
+              ? overdueTaskNumber
+              : null;
+          return (
+            <div
+        className={"optionsContainer"}
+        key={index}
+        onClick={() => onClick(item.key)}
+      >
+        <span className="iconsstyle">{item.icon}</span>
+        {showNumber && (
+          <span className="numberBadge">{number}</span>
+        )}
+        <h5 style={{ marginTop: "20%" }}>{item.label}</h5>
       </div>
+          );
+        })}
+    </div>
+      }
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import "./usercreation.css";
-import { Tabs ,Input} from "antd";
+import { Tabs, Input } from "antd";
 import {
   UserOutlined,
   SolutionOutlined,
@@ -15,7 +15,56 @@ import "react-toastify/dist/ReactToastify.css";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useNavigate } from "react-router-dom";
 import { GlobalContext } from "./utils/GlobalContext";
-import Checkbox from '@mui/material/Checkbox';
+import Checkbox from "@mui/material/Checkbox";
+import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
+
+const WhiteTextField = styled(TextField)(({ theme }) => ({
+  "& .MuiInputBase-input": {
+    color: "white", // text color
+  },
+  "& .MuiInputLabel-root": {
+    color: "white", // label color
+  },
+  "& .MuiInputBase-input::placeholder": {
+    color: "white", // placeholder color
+  },
+  "& .MuiInputBase-input.Mui-disabled": {
+    color: "white", // placeholder color
+  },
+}));
+
+const CustomAutocomplete = styled(Autocomplete)(({ theme }) => ({
+  "& .MuiAutocomplete-option": {
+    backgroundColor: "lightblue", // Customize this color
+    '&[data-focus="true"]': {
+      backgroundColor: "lightgreen", // Color when focused
+    },
+    '&[aria-selected="true"]': {
+      backgroundColor: "blue", // Color when selected
+      color: "white", // Text color when selected
+    },
+  },
+}));
+
+const StyledTabs = styled(Tabs)(({ theme }) => ({
+  "& .ant-tabs-tab-btn": {
+    color: "#0A6847", // text color
+  },
+}));
+
+const GradientButton = styled(Button)(({ theme }) => ({
+  background: "linear-gradient(45deg, #0A6847 20%, #41B06E 90%)", // your gradient colors
+  border: 0,
+  borderRadius: 3,
+  boxShadow: "0 3px 5px 2px #0A6847", // optional shadow
+  color: "white",
+  height: 48,
+  padding: "0 30px",
+  "&:hover": {
+    background: "linear-gradient(45deg, #41B06E 20%, #0A6847 90%)", // ensure hover state maintains the gradient
+  },
+}));
 
 const { TabPane } = Tabs;
 
@@ -58,7 +107,7 @@ const getuserlist = async (navigation, userName) => {
         "Session storage accesstoken refreshed",
         sessionStorage.getItem("accesstoken")
       );
-      getuserlist(navigation,userName);
+      getuserlist(navigation, userName);
     } else if (respData.status === "success") {
       console.log("After user list API hit >>>", respData.userlist);
       if (Array.isArray(respData.userlist.myArrayList)) {
@@ -88,16 +137,15 @@ function UserCreation({ mainPageHandle }) {
   const { userName } = useContext(GlobalContext);
   const [users, SetUsers] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [isotp,setIsotp] = useState(false);
-  const [reporttoempid,setReporttoempid] = useState("");
-  const [firstnameerror,setFirstNameError] = useState("");
-  const [lastnameerror,setLastNameError] = useState("");
-  const [emailiderror,setEmailidError] = useState("");
-  const [roleerror,setRoleError] = useState("");
-  const [reporttoerror,setReporttoerror] = useState("");
-  const [usernameerror,setUserNameError] = useState("");
-  const [passworderror,setPasswordError] = useState("");
-  
+  const [isotp, setIsotp] = useState(false);
+  const [reporttoempid, setReporttoempid] = useState("");
+  const [firstnameerror, setFirstNameError] = useState("");
+  const [lastnameerror, setLastNameError] = useState("");
+  const [emailiderror, setEmailidError] = useState("");
+  const [roleerror, setRoleError] = useState("");
+  const [reporttoerror, setReporttoerror] = useState("");
+  const [usernameerror, setUserNameError] = useState("");
+  const [passworderror, setPasswordError] = useState("");
 
   console.log("aftr useres set .", users);
 
@@ -107,46 +155,46 @@ function UserCreation({ mainPageHandle }) {
     );
   };
   const nextTab = (key) => {
-    let flag=true;
-    console.log("this is next tab key",key);
-    if(key-1===1){
-      if(firstname===null || firstname===""){
+    let flag = true;
+    console.log("this is next tab key", key);
+    if (key - 1 === 1) {
+      if (firstname === null || firstname === "") {
         setFirstNameError("First Name Mandatory");
-        flag=false;
+        flag = false;
       }
-       if(lastname===null || lastname===""){
+      if (lastname === null || lastname === "") {
         setLastNameError("lastname empty");
-        flag=false
+        flag = false;
       }
-      if(emailid===null || emailid===""){
+      if (emailid === null || emailid === "") {
         setEmailidError("emailid empty");
-        flag=false;
-      }else if(!validateEmail(emailid)){
+        flag = false;
+      } else if (!validateEmail(emailid)) {
         console.log("invalid emailid");
         setEmailidError("emailid Not Correct");
-        flag=false;
+        flag = false;
       }
-      if(flag){
+      if (flag) {
         setRole("");
         setReportTo("");
       }
-    }else if(key-1==2){
-      if(role===null || role===""){
+    } else if (key - 1 == 2) {
+      if (role === null || role === "") {
         setRoleError("role is empty");
-        flag=false;
+        flag = false;
       }
-      if(reportto===null || reportto===""){
+      if (reportto === null || reportto === "") {
         setReporttoerror("report to is empy");
-        flag=false;
+        flag = false;
       }
     }
-    if(flag){
+    if (flag) {
       setActiveTab(key);
-    }else{
-      console.log("emlid id error",emailiderror);
-      if(emailiderror==="emailid Not Correct"){
+    } else {
+      console.log("emlid id error", emailiderror);
+      if (emailiderror === "emailid Not Correct") {
         toast.error("Enter the Valid Emaliid");
-      }else{
+      } else {
         toast.error("Enter the mandatory fields");
       }
     }
@@ -155,7 +203,7 @@ function UserCreation({ mainPageHandle }) {
   const inputChange = (event) => {
     if (event.target.name === "firstname") {
       setFirstName(event.target.value);
-      setFirstNameError("")
+      setFirstNameError("");
     } else if (event.target.name === "lastname") {
       setLastName(event.target.value);
       setLastNameError("");
@@ -164,7 +212,7 @@ function UserCreation({ mainPageHandle }) {
       setEmailidError("");
     } else if (event.target.name === "username") {
       setUserName(event.target.value);
-      setUserNameError("")
+      setUserNameError("");
     } else if (event.target.name === "password") {
       setPassword(event.target.value);
       setPasswordError("");
@@ -222,26 +270,26 @@ function UserCreation({ mainPageHandle }) {
 
     fetchUserList();
 
-    const getroledetails = async()=>{
-      const roles = await getRoles(userName,navigation);
+    const getroledetails = async () => {
+      const roles = await getRoles(userName, navigation);
       setRoles(roles);
-    }
+    };
 
     getroledetails();
   }, []);
 
   const saveUser = () => {
-    let flag=true;
-    if(username===null || username===""){
-       setUserNameError("username empty");
-       flag=false
+    let flag = true;
+    if (username === null || username === "") {
+      setUserNameError("username empty");
+      flag = false;
     }
 
-    if(password===null || password===""){
+    if (password === null || password === "") {
       setPasswordError("password empty");
-      flag=false;
+      flag = false;
     }
-    if(flag){
+    if (flag) {
       const saveData = {
         firstname: firstname,
         lastname: lastname,
@@ -251,11 +299,11 @@ function UserCreation({ mainPageHandle }) {
         reportto: reportto,
         username: username,
         password: password,
-        isotp : isotp,
-        reporttoempid : reporttoempid
+        isotp: isotp,
+        reporttoempid: reporttoempid,
       };
-      saveUserData(saveData,username,navigation,mainPageHandle);
-    }    
+      saveUserData(saveData, username, navigation, mainPageHandle);
+    }
   };
 
   const onTabChange = (key) => {
@@ -268,16 +316,22 @@ function UserCreation({ mainPageHandle }) {
     console.log("Selected:", value);
   };
 
-  const onChangeOtp = (e)=>{
+  const onChangeOtp = (e) => {
     setIsotp(e.target.checked);
-    console.log("this is otp",e.target.checked);
-  }
+    console.log("this is otp", e.target.checked);
+  };
+
   return (
     <div class="usercreationmain">
       <div>
         <ToastContainer position="top-right" reverseOrder={false} />
       </div>
-      <Tabs centered activeKey={activeTab} onChange={() => onTabChange}>
+      <StyledTabs
+        style={{ color: "#0A6847" }}
+        centered
+        activeKey={activeTab}
+        onChange={() => onTabChange}
+      >
         <TabPane
           tab={
             <span>
@@ -289,42 +343,65 @@ function UserCreation({ mainPageHandle }) {
         >
           <div className="user_info_center">
             <h3>First Name*</h3>
-            <Input
+            <WhiteTextField
               type="text"
               name="firstname"
+              variant="standard"
               value={firstname}
               onChange={inputChange}
               error={!!firstnameerror}
-              className={firstnameerror ? 'error-input' : ''}
-            ></Input>
+              className={firstnameerror ? "error-input" : ""}
+              style={{ height: "25px", width: "250px" }}
+            ></WhiteTextField>
+            <br></br>
+            <br></br>
             <h3>Last Name*</h3>
-            <Input
+            <WhiteTextField
               type="text"
               name="lastname"
               value={lastname}
+              variant="standard"
               onChange={inputChange}
               error={!!lastnameerror}
-              className={lastnameerror ? 'error-input' : ''}
-            ></Input>
+              className={lastnameerror ? "error-input" : ""}
+              style={{ height: "25px", width: "250px" }}
+            ></WhiteTextField>
+            <br></br>
+            <br></br>
             <h3>Email*</h3>
-            <Input
+            <WhiteTextField
               type="email"
               name="emailid"
               value={emailid}
+              variant="standard"
               onChange={inputChange}
               error={!!emailiderror}
-              className={emailiderror ? 'error-input' : ''}
-            ></Input>
+              className={emailiderror ? "error-input" : ""}
+              style={{ height: "25px", width: "250px" }}
+            ></WhiteTextField>
+            <br></br>
+            <br></br>
             <h3>Employee Id</h3>
-            <Input type="text" disabled={true} value={empid}></Input>
+            <WhiteTextField
+              type="text"
+              disabled={true}
+              value={empid}
+              variant="standard"
+              style={{ height: "25px", width: "250px", color: "#fff" }}
+            ></WhiteTextField>
             <br></br>
             <br></br>
-            <button type="button" onClick={() => nextTab("2")} style={{ marginLeft: "10px" }}>
+            <br></br>
+            <GradientButton
+              type="button"
+              onClick={() => nextTab("2")}
+              style={{ marginLeft: "10px" }}
+            >
               Next
               <span>
                 <ArrowRightOutlined />
               </span>
-            </button>
+            </GradientButton>
           </div>
         </TabPane>
         <TabPane
@@ -338,7 +415,7 @@ function UserCreation({ mainPageHandle }) {
         >
           <div className="user_info_center">
             <h3>Role*</h3>
-            <Autocomplete
+            <CustomAutocomplete
               value={role}
               onChange={(event, newValue) => {
                 setRole(newValue);
@@ -358,24 +435,27 @@ function UserCreation({ mainPageHandle }) {
                   label="Select Options"
                   variant="outlined"
                   error={!!roleerror}
-                  className={roleerror ? 'error-input' : ''}
+                  className={roleerror ? "error-input" : ""}
+                  InputProps={{
+                    ...params.InputProps,
+                    style: { color: role ? "white" : "black" }, // Customize selected value text color
+                  }}
                 />
               )}
               sx={{ mb: 2, width: "100%" }}
-              
             />
 
             <h3>Reporting To*</h3>
 
-            <Autocomplete
+            <CustomAutocomplete
               value={reportto}
               onChange={(event, newValue) => {
-                console.log(event," afasfasd",newValue);
-                if(newValue!==null){
+                console.log(event, " afasfasd", newValue);
+                if (newValue !== null) {
                   setReportTo(newValue);
                   setReporttoempid(newValue.empid);
                   setReporttoerror("");
-                }else{
+                } else {
                   setReportTo("");
                   setReporttoempid("");
                 }
@@ -396,7 +476,11 @@ function UserCreation({ mainPageHandle }) {
                   label="Select Options"
                   variant="outlined"
                   error={!!reporttoerror}
-                  className={reporttoerror ? 'error-input' : ''}
+                  className={reporttoerror ? "error-input" : ""}
+                  InputProps={{
+                    ...params.InputProps,
+                    style: { color: role ? "white" : "black" }, // Customize selected value text color
+                  }}
                 />
               )}
               sx={{ mb: 2, width: "100%" }}
@@ -429,7 +513,7 @@ function UserCreation({ mainPageHandle }) {
               value={username}
               onChange={inputChange}
               error={!!firstnameerror}
-              className={usernameerror ? 'error-input' : ''}
+              className={usernameerror ? "error-input" : ""}
             ></Input>
             <h3>Password</h3>
             <Input
@@ -438,17 +522,17 @@ function UserCreation({ mainPageHandle }) {
               value={password}
               onChange={inputChange}
               error={!!firstnameerror}
-              className={passworderror ? 'error-input' : ''}
+              className={passworderror ? "error-input" : ""}
             ></Input>
             <br></br>
             <br></br>
             <label>
-            <Checkbox color="success"  onChange={onChangeOtp}/>
-             Is OTP
-      </label>
+              <Checkbox color="success" onChange={onChangeOtp} />
+              Is OTP
+            </label>
             <br></br>
             <br></br>
-            <button onClick={() => nextTab("2")} >
+            <button onClick={() => nextTab("2")}>
               <span>{<ArrowLeftOutlined />}</span>Previous
             </button>
             <button onClick={saveUser} style={{ marginLeft: "10px" }}>
@@ -456,31 +540,34 @@ function UserCreation({ mainPageHandle }) {
             </button>
           </div>
         </TabPane>
-      </Tabs>
+      </StyledTabs>
     </div>
   );
 }
 
 export default UserCreation;
 
-const getRoles = async (userName,navigation)=>{
+const getRoles = async (userName, navigation) => {
   var roles = [];
-  try{
-    const response = await fetch("http://localhost:8080/webapi/auth/getRoleDetails",{
-      method: "POST",
-      body: JSON.stringify({
-        username: userName,
-        Accesstoken: sessionStorage.getItem("accesstoken"),
-        RefreshToken: sessionStorage.getItem("refreshtoken"),
-        username: sessionStorage.getItem("username"),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
+  try {
+    const response = await fetch(
+      "http://localhost:8080/webapi/auth/getRoleDetails",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          username: userName,
+          Accesstoken: sessionStorage.getItem("accesstoken"),
+          RefreshToken: sessionStorage.getItem("refreshtoken"),
+          username: sessionStorage.getItem("username"),
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
 
-    if(!response.ok){
+    if (!response.ok) {
       throw new Error("NO HIT API");
     }
 
@@ -499,21 +586,20 @@ const getRoles = async (userName,navigation)=>{
         "session storge accesstocken refreshed ",
         sessionStorage.getItem("accesstoken")
       );
-      getRoles(userName,navigation);
+      getRoles(userName, navigation);
     } else if (respData.status === "success") {
       console.log("After user list API hit >>>", respData.roledetails);
       if (Array.isArray(respData.roledetails.myArrayList)) {
         roles = respData.roledetails.myArrayList.map((item) => item.map);
       }
     }
-  }catch(e){
+  } catch (e) {
     console.log(e);
   }
   return roles;
-}
+};
 
-const saveUserData = (saveData,userName,navigation,mainPageHandle)=>{
-
+const saveUserData = (saveData, userName, navigation, mainPageHandle) => {
   console.log("JSON <>>>", JSON.stringify(saveData));
   fetch("http://localhost:8080/webapi/auth/usercreation", {
     method: "POST",
@@ -564,4 +650,4 @@ const saveUserData = (saveData,userName,navigation,mainPageHandle)=>{
     .catch((exception) => {
       console.log("Exception : ", exception);
     });
-}
+};

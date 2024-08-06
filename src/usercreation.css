@@ -5,13 +5,17 @@
   margin-left:25%;
 
   /* From https://css.glass */
-  background: rgba(255, 255, 255, 0.2);
+  background: #282b31;
   border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 70px rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #343536;
+ 
+}
 
+.user_info_center h3{
+  color: aliceblue;
 }
 
 .usercreation_bg{
@@ -19,10 +23,12 @@
 }
 
 .usercreationmain{
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  background-color: #282b31;
 }
 
-.error-input {
-  border: 1px solid red;
+.autocomplete-options{
+  color: aliceblue;
+  background-color: #282b31;
 }

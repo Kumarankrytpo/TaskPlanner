@@ -52,7 +52,7 @@ function Login() {
     sessionStorage.removeItem("username");
   }, []);
 
-  const validateLogin = () => {
+  const validateLogin = async () => {
     let rtnflag = true;
     if (username === undefined || username === '' || username.length === 0) {
       rtnflag = false;
@@ -61,24 +61,27 @@ function Login() {
       rtnflag = false;
     }
     if (rtnflag) {
-      fetch("http://localhost:8080/webapi/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        }),
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+      try{
+        const response = await fetch("http://localhost:8080/webapi/auth/login",{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password
+          }),
+        });
+
+        if(!response.ok){
+          toast.error("Someting Went Wrong");
+          throw new Error("API NOT HIT");
         }
-        return response.json();
-      }).then((data) => {
+
+        const data = await response.json();
         const respData = JSON.parse(JSON.stringify(data));
-        console.log("THIS IS LOGIN RESPONSE ::: ", respData);
+
         if (respData.check !== undefined && respData.check === "success") {
           sessionStorage.setItem("accesstoken", respData.accesstoken);
           sessionStorage.setItem("refreshtoken", respData.refreshtoken);
@@ -101,9 +104,11 @@ function Login() {
         } else {
           toast.error('Account Not Exists.');
         }
-      }).catch((error) => {
-        console.error('There was a problem with the fetch operation:', error);
-      });
+
+      }catch(e){
+        console.log(e);
+        toast.error("Someting Went Wrong");
+      }
     }
   };
 

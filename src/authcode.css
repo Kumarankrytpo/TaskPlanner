@@ -1,12 +1,10 @@
 .auth_bg{
-  background: url("../public/authBG.jpg");
-  background-size: cover;
-  background-position: center;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center; /* Horizontally center the .center div */
-  align-items: center; 
+  align-items: center; /* Vertically center the .center div */
+  background-color: #282b31;
 }
 
 .authCodeIdentify_bg{
@@ -22,14 +20,23 @@
 .auth_container{
   width: 30%;
   text-align: center;
-  padding: 10px;
+  padding: 30px;
+  color: aliceblue;
 
   /* From https://css.glass */
-  background: rgba(255, 255, 255, 0.2);
-border-radius: 16px;
-box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-backdrop-filter: blur(5px);
--webkit-backdrop-filter: blur(5px);
-border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #282b31;
+  border-radius: 16px;
+  box-shadow: 0 4px 70px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid #282b31;
+  position: absolute;
+}
+
+.waveupper{
+  background-color: #282b31;
+  display: block;
+  width: 100%;
+  margin-top: 8%;
 }
 

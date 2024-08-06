@@ -23,7 +23,7 @@
     /* From https://css.glass */
 background: #282b31;
 border-radius: 16px;
-box-shadow: 0 40px 70px rgba(0, 0, 0, 0.8);
+box-shadow: 0 40px 70px rgba(20, 26, 78, 0.8);
 backdrop-filter: blur(5px);
 -webkit-backdrop-filter: blur(5px);
 border: #282b31;
@@ -35,7 +35,7 @@ border: #282b31;
     justify-content: center;
 
     /* Adjust height to be as minimal as possible */
-    height: 10%; 
+    height: 25%; 
     min-height: 100px; /* Set a reasonable minimum height */
     position: relative;
     display: inline-block;
@@ -79,5 +79,11 @@ h5 {
     font-size: 0.8em;
     line-height: 1em;
     width: 20px;
+  }
+
+  .dashboardmain{
+    width: 100%;
+    height: 100%;
+    background-color: #282b31;
   }
   
