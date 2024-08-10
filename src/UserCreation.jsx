@@ -32,6 +32,7 @@ const WhiteTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input.Mui-disabled": {
     color: "white", // placeholder color
   },
+  
 }));
 
 const CustomAutocomplete = styled(Autocomplete)(({ theme }) => ({
@@ -44,6 +45,11 @@ const CustomAutocomplete = styled(Autocomplete)(({ theme }) => ({
       backgroundColor: "blue", // Color when selected
       color: "white", // Text color when selected
     },
+    '&[data-shrink=false]': {
+      backgroundColor: "blue", // Color when selected
+      color: "white", // Text color when selected
+    },
+    
   },
 }));
 
@@ -479,7 +485,7 @@ function UserCreation({ mainPageHandle }) {
                   className={reporttoerror ? "error-input" : ""}
                   InputProps={{
                     ...params.InputProps,
-                    style: { color: role ? "white" : "black" }, // Customize selected value text color
+                    style: { color: "white" }, // Customize selected value text color
                   }}
                 />
               )}
@@ -488,12 +494,12 @@ function UserCreation({ mainPageHandle }) {
 
             <br></br>
             <br></br>
-            <button onClick={() => nextTab("1")}>
+            <GradientButton onClick={() => nextTab("1")}>
               <span>{<ArrowLeftOutlined />}</span>Previous
-            </button>
-            <button onClick={() => nextTab("3")} style={{ marginLeft: "10px" }}>
+            </GradientButton>
+            <GradientButton onClick={() => nextTab("3")} style={{ marginLeft: "10px" }}>
               Next<span>{<ArrowRightOutlined />}</span>
-            </button>
+            </GradientButton>
           </div>
         </TabPane>
         <TabPane
@@ -507,23 +513,27 @@ function UserCreation({ mainPageHandle }) {
         >
           <div className="user_info_center">
             <h3>User Name</h3>
-            <Input
+            <WhiteTextField
               type="text"
               name="username"
               value={username}
               onChange={inputChange}
+              variant="standard"
               error={!!firstnameerror}
               className={usernameerror ? "error-input" : ""}
-            ></Input>
+            ></WhiteTextField>
+            <br></br>
+            <br></br>
             <h3>Password</h3>
-            <Input
+            <WhiteTextField
               type="password"
               name="password"
               value={password}
+              variant="standard"
               onChange={inputChange}
               error={!!firstnameerror}
               className={passworderror ? "error-input" : ""}
-            ></Input>
+            ></WhiteTextField>
             <br></br>
             <br></br>
             <label>
@@ -532,12 +542,12 @@ function UserCreation({ mainPageHandle }) {
             </label>
             <br></br>
             <br></br>
-            <button onClick={() => nextTab("2")}>
+            <GradientButton onClick={() => nextTab("2")}>
               <span>{<ArrowLeftOutlined />}</span>Previous
-            </button>
-            <button onClick={saveUser} style={{ marginLeft: "10px" }}>
+            </GradientButton>
+            <GradientButton onClick={saveUser} style={{ marginLeft: "10px" }}>
               Submit<span>{<CheckCircleOutlined />}</span>
-            </button>
+            </GradientButton>
           </div>
         </TabPane>
       </StyledTabs>

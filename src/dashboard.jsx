@@ -356,6 +356,7 @@ const tasknumber = async (userName,navigation,empCode)=>{
       }
       const data = await response.json();
       const respData = JSON.parse(JSON.stringify(data));
+      console.log(respData);
       if (respData.status === "sessionexpired") {
         sessionStorage.removeItem("accesstoken");
         sessionStorage.removeItem("refreshtoken");

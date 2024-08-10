@@ -1,89 +1,94 @@
 .mainOptionContainer {
-    padding: 30px;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    column-gap: 20px; /* Adjusts horizontal space between items */
-    row-gap: 20px; /* Reduces vertical space between rows */
-    justify-content: flex-start; /* Aligns items to the start (left) */
-    align-items: stretch; /* Aligns the items to the top */
-    align-content: flex-start;
-    background-color: #282b31;
-    color: aliceblue;
+  padding: 30px;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 20px; /* Adjusts horizontal space between items */
+  row-gap: 20px; /* Reduces vertical space between rows */
+  justify-content: flex-start; /* Aligns items to the start (left) */
+  align-items: stretch; /* Aligns the items to the top */
+  align-content: flex-start;
+  background-color: #282b31;
+  color: aliceblue;
+}
+
+.optionsContainer:hover{
+  box-shadow: 0 40px 70px rgba(20, 85, 37, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: #282b31;
+  color: #41B06E;
 }
 
 .optionsContainer {
-    width: 13%;
-    text-align: center;
-    padding: 10px;
-    margin: 0; /* Ensure no extra margin */
+  width: 13%;
+  text-align: center;
+  padding: 10px;
+  margin: 0; /* Ensure no extra margin */
 
-    /* From https://css.glass */
-background: #282b31;
-border-radius: 16px;
-box-shadow: 0 40px 70px rgba(20, 26, 78, 0.8);
-backdrop-filter: blur(5px);
--webkit-backdrop-filter: blur(5px);
-border: #282b31;
+  /* From https://css.glass */
+  background: #282b31;
+  border-radius: 16px;
+  box-shadow: 0 40px 70px rgba(20, 26, 78, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: #282b31;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    /* Adjust height to be as minimal as possible */
-    height: 25%; 
-    min-height: 100px; /* Set a reasonable minimum height */
-    position: relative;
-    display: inline-block;
-    margin: 10px;
+  /* Adjust height to be as minimal as possible */
+  height: 20%;
+  min-height: 100px; /* Set a reasonable minimum height */
+  position: relative;
+  display: inline-block;
+  margin: 10px;
 }
 
 .iconsstyle {
-    font-size: 40px;
-    margin: 0; /* Ensure no extra margin */
+  font-size: 40px;
+  margin: 0; /* Ensure no extra margin */
 }
 
 h5 {
-    margin-top: 5px; /* Reduce margin as needed */
-    margin-bottom: 0; /* Ensure no extra margin */
-    line-height: 1;
+  margin-top: 5px; /* Reduce margin as needed */
+  margin-bottom: 0; /* Ensure no extra margin */
+  line-height: 1;
 }
 
 .optionsContainerhome--hover {
-    background-color: #333; /* Hover color */
-  }
+  background-color: #333; /* Hover color */
+}
 
-  
-  .ant-menu {
-    display: flex;
-    justify-content: space-between;
-    flex: 0 0 auto; /* Set flex properties to fix "TASK PLANNER" position */
-  }
-  
-  .ant-menu-item:first-child {
-    flex: 1; /* Make the first menu item (TASK PLANNER) take up some space */
-  }
-  
-  .numberBadge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: red;
-    color: white;
-    border-radius: 50%;
-    padding: 5px;
-    font-size: 0.8em;
-    line-height: 1em;
-    width: 20px;
-  }
+.ant-menu {
+  display: flex;
+  justify-content: space-between;
+  flex: 0 0 auto; /* Set flex properties to fix "TASK PLANNER" position */
+}
 
-  .dashboardmain{
-    width: 100%;
-    height: 100%;
-    background-color: #282b31;
-  }
-  
+.ant-menu-item:first-child {
+  flex: 1; /* Make the first menu item (TASK PLANNER) take up some space */
+}
+
+.numberBadge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+  font-size: 0.8em;
+  line-height: 1em;
+  width: 20px;
+}
+
+.dashboardmain {
+  width: 100%;
+  height: 100%;
+  background-color: #282b31;
+}

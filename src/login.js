@@ -44,7 +44,8 @@ function Login() {
   const [username, setLoginUserName] = useState("");
   const [password, setLoginPassword] = useState("");
   const navigate = useNavigate();
-  const { setUserName, updateempCode, updateGlobalValue } = useContext(GlobalContext);
+  const { setUserName, updateempCode, updateGlobalValue ,updateUserId
+  ,updatemailid} = useContext(GlobalContext);
 
   useEffect(() => {
     sessionStorage.removeItem("accesstoken");
@@ -90,6 +91,8 @@ function Login() {
           setUserName(username);
           updateempCode(respData.empcode);
           updateGlobalValue(respData.role);
+          updateUserId(respData.userid);
+          updatemailid(respData.emailid);
           if (respData.isotp) {
             navigate("/authcode", {
               state: {

@@ -22,8 +22,22 @@ function GlobalProvider({ children }) {
     setempCode(empcode);
   };
 
+
+  const [userid, setUserId] = useState();
+
+  const updateUserId = (userid) => {
+    setUserId(userid);
+  };
+
+  const [emailid,setEmailid] = useState("");
+
+  const updatemailid = (emailid)=>{
+    setEmailid(emailid);
+  }
+
   return (
-    <GlobalContext.Provider value={{ userRole, updateGlobalValue ,userName,setUserName,empCode,updateempCode}}>
+    <GlobalContext.Provider value={{ userRole, updateGlobalValue ,userName,setUserName,
+    empCode,updateempCode,userid,updateUserId,emailid,updatemailid}}>
       {children}
     </GlobalContext.Provider>
   );
