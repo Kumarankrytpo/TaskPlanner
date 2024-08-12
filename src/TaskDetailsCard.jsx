@@ -232,13 +232,7 @@ const TaskDetailsCard = ({ task, fetchTaskDetails }) => {
 
 export default TaskDetailsCard;
 
-const setCompleteTask = async (
-  taskid,
-  navigation,
-  empCode,
-  userName,
-  fetchTaskDetails
-) => {
+const setCompleteTask = async (taskid,navigation,empCode,userName,fetchTaskDetails) => {
   try {
     const response = await fetch(
       "http://localhost:8080/webapi/auth/setCompleteTask",

@@ -6,10 +6,6 @@ import {
   StepLabel,
   Typography,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Box,
   LinearProgress,
 } from "@mui/material";
@@ -18,6 +14,7 @@ import { DatePicker } from "antd";
 import { GlobalContext } from "./utils/GlobalContext";
 import { useNavigate } from "react-router-dom";
 import { Input } from "antd";
+import { ToastContainer, toast } from 'react-toastify';
 
 const { TextArea } = Input;
 
@@ -54,6 +51,7 @@ const TaskCreation = ({ mainPageHandle }) => {
       if(subtasks.length>=1 && subtasks[0].subtaskDeadline!==null){
          setDeadline(subtasks[subtasks.length-1].subtaskDeadline);
          setDeadeLineDis(true);
+         setSubTaskCount(subtasks[0].subtaskDeadline!==null ? subtasks.length : 0);
       }
       console.log(deadline);
     } else if (activeStep === 2) {
@@ -100,54 +98,19 @@ const TaskCreation = ({ mainPageHandle }) => {
 
   useEffect(() => {
     console.log("dgdfg", userName);
-    fetch("http://localhost:8080/webapi/auth/getTeamMember", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        user: userName,
-        Accesstoken: sessionStorage.getItem("accesstoken"),
-        RefreshToken: sessionStorage.getItem("refreshtoken"),
-        username: sessionStorage.getItem("username"),
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const respData = JSON.parse(JSON.stringify(data));
-        console.log("Status >>", respData);
-        if (respData.status === "sessionexpired") {
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.removeItem("refreshtoken");
-          sessionStorage.removeItem("username");
-          navigation("/");
-        } else if (respData.status === "tokenrefreshed") {
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.setItem("accesstoken", data.token);
-          console.log(
-            "session storge accesstocken refreshed ",
-            sessionStorage.getItem("accesstoken")
-          );
-        } else if (respData.status === "success") {
-          const userList = data.userlist.myArrayList; // Extract the array
-          if (Array.isArray(userList)) {
-            const formattedOptions = userList.map((item) => item.map); // Extract the 'map' object
-            setOptions(formattedOptions);
-          } else {
-            console.error("Expected userList to be an array:", userList);
-          }
-        }
-      })
-      .catch((e) => {
-        console.log("Error in API", e);
-      });
-  }, []);
+
+    const getTeamMemebers = async ()=>{
+      var teamlist = await team(navigation,userName);
+      if (Array.isArray(teamlist)) {
+        const formattedOptions = teamlist.map((item) => item.map); // Extract the 'map' object
+        setOptions(formattedOptions);
+      } else {
+        toast.error("Something Went Wrong");
+        console.error("Expected userList to be an array:", teamlist);
+      }
+    }
+    getTeamMemebers();    
+  }, [navigation,userName]);
 
   const addSubtask = () => setSubtasks([...subtasks, { subtaskheader: "", subtaskDeadline: null }]);
 
@@ -156,6 +119,7 @@ const TaskCreation = ({ mainPageHandle }) => {
   }
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "70vh", p: 3 }}>
+      <ToastContainer position="top-right" reverseOrder={false} />
       <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
         {steps.map((label) => (
           <Step key={label}>
@@ -179,7 +143,13 @@ const TaskCreation = ({ mainPageHandle }) => {
             />
             <br></br>
             <br></br>
-            <TextArea rows={4} value={summary} onChange={summaryChange} placeholder="maxLength is 500" maxLength={500} />
+            <TextArea 
+            rows={4} 
+            value={summary} 
+            onChange={summaryChange} 
+            placeholder="maxLength is 500" 
+            maxLength={500}
+             />
           </>
         )}
         {activeStep === 1 && (
@@ -302,47 +272,98 @@ const TaskCreation = ({ mainPageHandle }) => {
 
 export default TaskCreation;
 
-function savetaskdetails(taskdetails) {
-  return fetch("http://localhost:8080/webapi/auth/saveTaskDetails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      taskdata: taskdetails,
-      Accesstoken: sessionStorage.getItem("accesstoken"),
-      RefreshToken: sessionStorage.getItem("refreshtoken"),
-      username: sessionStorage.getItem("username"),
-    }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const respData = JSON.parse(JSON.stringify(data));
-      console.log("Status >>", respData);
-      if (respData.status === "sessionexpired") {
-        sessionStorage.removeItem("accesstoken");
-        sessionStorage.removeItem("refreshtoken");
-        sessionStorage.removeItem("username");
-      } else if (respData.status === "tokenrefreshed") {
-        console.log("data acc", data.token);
-        sessionStorage.removeItem("accesstoken");
-        sessionStorage.setItem("accesstoken", data.token);
-        console.log(
-          "session storge accesstocken refreshed ",
-          sessionStorage.getItem("accesstoken")
-        );
-        savetaskdetails(taskdetails);
-      } else if (respData.status === "success") {
-        console.log("inside success methd");
-      }
-    })
-    .catch((e) => {
-      console.log("Error in API", e);
+const savetaskdetails = async (taskdetails) =>{
+  try{
+     const response = await fetch("http://localhost:8080/webapi/auth/saveTaskDetails",{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        taskdata: taskdetails,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+      })
+     });
+
+     if(!response.ok){
+      toast.error("Something Went Wrong");
+      throw new Error("APIT NOt hit for save task details");
+     }
+
+     const data = await response.json();
+     const respData = JSON.parse(JSON.stringify(data));
+
+     if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+    } else if (respData.status === "tokenrefreshed") {
+      console.log("data acc", data.token);
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "session storge accesstocken refreshed ",
+        sessionStorage.getItem("accesstoken")
+      );
+      savetaskdetails(taskdetails);
+    } else if (respData.status === "success") {
+      toast.success("Task Created");
+    }
+  }catch(e){
+    toast.error("Something Went Wrong");
+    console.log(e);
+  }
+}
+
+const team = async (navigation,userName)=>{
+  var teamlist ;
+  try{
+
+    const response = await fetch("http://localhost:8080/webapi/auth/getTeamMember",{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        user: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+        username: sessionStorage.getItem("username"),
+      }),
     });
+
+    if(!response.ok){
+      toast.error("Something Went Wrong");
+      throw new Error("API for Team list error");
+    }
+
+    const data = await response.json();
+    const respData = JSON.parse(JSON.stringify(data));
+
+    if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+      navigation("/");
+    } else if (respData.status === "tokenrefreshed") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "session storge accesstocken refreshed ",
+        sessionStorage.getItem("accesstoken")
+      );
+      team();
+    } else if (respData.status === "success") {
+      teamlist = data.userlist.myArrayList; // Extract the array
+      
+    }
+  }catch(e){
+    toast.error("Something Went Wrong");
+    console.log(e);
+  }
+  return teamlist;
 }

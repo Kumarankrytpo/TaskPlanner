@@ -1,5 +1,5 @@
 import "./usercreation.css";
-import { Tabs, Input } from "antd";
+import { Tabs } from "antd";
 import {
   UserOutlined,
   SolutionOutlined,
@@ -32,7 +32,9 @@ const WhiteTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input.Mui-disabled": {
     color: "white", // placeholder color
   },
-  
+  "&MuiInputBase-input-MuiInput-input.Mui-disabled" :{
+    color : "white",
+  }
 }));
 
 const CustomAutocomplete = styled(Autocomplete)(({ theme }) => ({
@@ -73,61 +75,6 @@ const GradientButton = styled(Button)(({ theme }) => ({
 }));
 
 const { TabPane } = Tabs;
-
-const getuserlist = async (navigation, userName) => {
-  console.log("INSIDE USER LIST METHOD");
-  let userlist = [];
-
-  try {
-    const response = await fetch("http://localhost:8080/webapi/auth/getUsers", {
-      method: "POST",
-      body: JSON.stringify({
-        username: userName,
-        Accesstoken: sessionStorage.getItem("accesstoken"),
-        RefreshToken: sessionStorage.getItem("refreshtoken"),
-        username: sessionStorage.getItem("username"),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    const respData = JSON.parse(JSON.stringify(data));
-    console.log("Status >>", respData);
-
-    if (respData.status === "sessionexpired") {
-      sessionStorage.removeItem("accesstoken");
-      sessionStorage.removeItem("refreshtoken");
-      sessionStorage.removeItem("username");
-      navigation("/");
-    } else if (respData.status === "tokenrefreshed") {
-      sessionStorage.removeItem("accesstoken");
-      sessionStorage.setItem("accesstoken", data.token);
-      console.log(
-        "Session storage accesstoken refreshed",
-        sessionStorage.getItem("accesstoken")
-      );
-      getuserlist(navigation, userName);
-    } else if (respData.status === "success") {
-      console.log("After user list API hit >>>", respData.userlist);
-      if (Array.isArray(respData.userlist.myArrayList)) {
-        userlist = respData.userlist.myArrayList.map((item) => item.map);
-      }
-      console.log("<><><<<<><><><><><", userlist);
-    }
-  } catch (e) {
-    console.error("There was a problem with the fetch operation:", e);
-  }
-
-  console.log("Before user list return", userlist);
-  return userlist;
-};
 
 function UserCreation({ mainPageHandle }) {
   const navigation = useNavigate();
@@ -184,7 +131,7 @@ function UserCreation({ mainPageHandle }) {
         setRole("");
         setReportTo("");
       }
-    } else if (key - 1 == 2) {
+    } else if (key - 1 === 2) {
       if (role === null || role === "") {
         setRoleError("role is empty");
         flag = false;
@@ -226,49 +173,15 @@ function UserCreation({ mainPageHandle }) {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/webapi/auth/getEmpID", {
-      method: "POST",
-      body: JSON.stringify({
-        username: userName,
-        Accesstoken: sessionStorage.getItem("accesstoken"),
-        RefreshToken: sessionStorage.getItem("refreshtoken"),
-        username: sessionStorage.getItem("username"),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const respData = JSON.parse(JSON.stringify(data));
-        console.log("EMPD CODE API", respData);
-        if (respData.status === "sessionexpired") {
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.removeItem("refreshtoken");
-          sessionStorage.removeItem("username");
-          navigation("/");
-        } else if (respData.status === "tokenrefreshed") {
-          sessionStorage.removeItem("accesstoken");
-          sessionStorage.setItem("accesstoken", data.token);
-          console.log(
-            "session storge accesstocken refreshed ",
-            sessionStorage.getItem("accesstoken")
-          );
-        } else if (respData.status === "success") {
-          setEmpid("EMP" + respData.empcode);
-          console.log("after empd code >>>" + empid);
-        }
-      })
-      .catch((e) => {
-        console.error("There was a problem with the fetch operation:", e);
-      });
 
+    const EMPIDRetreive =  async ()=>{
+      var empcodee =await empidretreive(navigation,userName);
+      console.log("user effcect",empcodee);
+       setEmpid("EMP"+empcodee);
+    } 
+
+    EMPIDRetreive();
+  
     const fetchUserList = async () => {
       const users = await getuserlist(navigation, userName);
       SetUsers(users); // assuming you have a state setter for options
@@ -282,7 +195,7 @@ function UserCreation({ mainPageHandle }) {
     };
 
     getroledetails();
-  }, []);
+  }, [navigation,userName]);
 
   const saveUser = () => {
     let flag = true;
@@ -316,10 +229,6 @@ function UserCreation({ mainPageHandle }) {
     if (key === "2") {
       console.log("2");
     }
-  };
-
-  const onSelect = (value) => {
-    console.log("Selected:", value);
   };
 
   const onChangeOtp = (e) => {
@@ -568,7 +477,6 @@ const getRoles = async (userName, navigation) => {
           username: userName,
           Accesstoken: sessionStorage.getItem("accesstoken"),
           RefreshToken: sessionStorage.getItem("refreshtoken"),
-          username: sessionStorage.getItem("username"),
         }),
         headers: {
           "Content-Type": "application/json",
@@ -617,7 +525,6 @@ const saveUserData = (saveData, userName, navigation, mainPageHandle) => {
       username: userName,
       Accesstoken: sessionStorage.getItem("accesstoken"),
       RefreshToken: sessionStorage.getItem("refreshtoken"),
-      username: sessionStorage.getItem("username"),
       userdetails: saveData,
     }),
     headers: {
@@ -660,4 +567,107 @@ const saveUserData = (saveData, userName, navigation, mainPageHandle) => {
     .catch((exception) => {
       console.log("Exception : ", exception);
     });
+};
+
+const empidretreive = async(navigation,userName) =>{
+  var empid = "";
+  try{
+     const response = await fetch("http://localhost:8080/webapi/auth/getEmpID",{
+      method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+     });
+
+     if(!response.ok){
+      toast.error("Somethig Went Error");
+      throw new Error("Api Not Hit for get emp code");
+     }
+
+     const data = await response.json();
+     const respData = JSON.parse(JSON.stringify(data));
+
+     console.log("inside get rmo id ",respData);
+     if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+      navigation("/");
+    } else if (respData.status === "tokenrefreshed") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "session storge accesstocken refreshed ",
+        sessionStorage.getItem("accesstoken")
+      );
+      empidretreive();
+    } else if (respData.status === "success") {
+      empid = respData.empcode;
+      console.log("after empd code >>>" + empid);
+    }
+  }catch(e){
+    toast.error("Something Went Error");
+    console.log(e);
+  }
+  return empid;
+}
+
+const getuserlist = async (navigation, userName) => {
+  console.log("INSIDE USER LIST METHOD");
+  let userlist = [];
+
+  try {
+    const response = await fetch("http://localhost:8080/webapi/auth/getUsers", {
+      method: "POST",
+      body: JSON.stringify({
+        username: userName,
+        Accesstoken: sessionStorage.getItem("accesstoken"),
+        RefreshToken: sessionStorage.getItem("refreshtoken"),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    const respData = JSON.parse(JSON.stringify(data));
+    console.log("Status >>", respData);
+
+    if (respData.status === "sessionexpired") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.removeItem("refreshtoken");
+      sessionStorage.removeItem("username");
+      navigation("/");
+    } else if (respData.status === "tokenrefreshed") {
+      sessionStorage.removeItem("accesstoken");
+      sessionStorage.setItem("accesstoken", data.token);
+      console.log(
+        "Session storage accesstoken refreshed",
+        sessionStorage.getItem("accesstoken")
+      );
+      getuserlist(navigation, userName);
+    } else if (respData.status === "success") {
+      console.log("After user list API hit >>>", respData.userlist);
+      if (Array.isArray(respData.userlist.myArrayList)) {
+        userlist = respData.userlist.myArrayList.map((item) => item.map);
+      }
+      console.log("<><><<<<><><><><><", userlist);
+    }
+  } catch (e) {
+    console.error("There was a problem with the fetch operation:", e);
+  }
+
+  console.log("Before user list return", userlist);
+  return userlist;
 };
