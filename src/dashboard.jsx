@@ -369,6 +369,7 @@ const tasknumber = async (userName,navigation,empCode)=>{
           "session storge accesstocken refreshed ",
           sessionStorage.getItem("accesstoken")
         );
+        tasknumber(userName,navigation,empCode);
       } else if (respData.status === "success") {
         console.log("tasko",respData);
         tasknumbers.push(data.ongoingtaskno, data.overduetaskno);
