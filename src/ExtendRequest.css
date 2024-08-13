@@ -1,88 +1,99 @@
 .App {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 20px; /* Adjust gap between containers */
-  }
-  
-  .task-container {
-    width: 300px; /* Increased width */
-    height: 300px; /* Increased height */
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .task-header {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  
-  .task-container h3 {
-    margin: 0;
-  }
-  
-  .button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  button {
-    padding: 10px 15px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 400px; /* Increased width for modal */
-    text-align: left;
-  }
-  
-  .modal-content h3 {
-    margin-top: 0;
-  }
-  
-  .modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-  }
-  
-  .modal-buttons button {
-    margin: 0 5px;
-  }
-  
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 20px; /* Adjust gap between containers */
+  color: #fff;
+}
+
+.task-container {
+  width: 350px; /* Increased width */
+  height: 250px; /* Increased height */
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 40px 70px rgba(20, 26, 78, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: #282b31;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-container:hover{
+  box-shadow: 0 40px 70px rgba(20, 85, 37, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: #282b31;
+  color: #41B06E;
+}
+
+.task-header {
+  width: 100%;
+  margin-bottom: 10px;
+  margin-left: 70%;
+}
+
+.task-container h3 {
+  margin: 0;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px; /* Increased width for modal */
+  text-align: left;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  margin: 0 5px;
+}

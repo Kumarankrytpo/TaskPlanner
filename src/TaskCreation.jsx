@@ -15,6 +15,36 @@ import { GlobalContext } from "./utils/GlobalContext";
 import { useNavigate } from "react-router-dom";
 import { Input } from "antd";
 import { ToastContainer, toast } from 'react-toastify';
+import { styled } from '@mui/material/styles';
+
+const CustomTextField = styled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: 'white', // Change border color to white
+    },
+    '&:hover fieldset': {
+      borderColor: 'white', // Change border color on hover to white
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: 'white', // Change border color when focused to white
+    },
+  },
+  '& .MuiInputBase-input': {
+    color: 'white', // Change input text color to white
+  },
+  '& .MuiInputLabel-root': {
+    color: 'white', // Change label text color to white
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'white', // Set the outline color to white
+  },
+  '& .MuiAutocomplete-inputRoot': {
+    '& .MuiAutocomplete-input': {
+      color: 'white', // Change placeholder text color to white
+    },
+  },
+});
+
 
 const { TextArea } = Input;
 
@@ -132,7 +162,7 @@ const TaskCreation = ({ mainPageHandle }) => {
         {activeStep === 0 && (
           <>
           <br></br>
-            <TextField
+            <CustomTextField
               label="Task Name"
               variant="outlined"
               fullWidth
@@ -205,7 +235,7 @@ const TaskCreation = ({ mainPageHandle }) => {
                 </li>
               )}
               renderInput={(params) => (
-                <TextField {...params} label="Assign To" variant="outlined" />
+                <CustomTextField {...params} label="Assign To" variant="outlined" />
               )}
               sx={{ mb: 2, width: "100%" }}
             />

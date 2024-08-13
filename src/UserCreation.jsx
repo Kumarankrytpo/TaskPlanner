@@ -345,7 +345,7 @@ function UserCreation({ mainPageHandle }) {
                 <li {...props}>{option.role}</li>
               )}
               renderInput={(params) => (
-                <TextField
+                <WhiteTextField
                   {...params}
                   label="Select Options"
                   variant="outlined"
@@ -386,7 +386,7 @@ function UserCreation({ mainPageHandle }) {
                 </li>
               )}
               renderInput={(params) => (
-                <TextField
+                <WhiteTextField
                   {...params}
                   label="Select Options"
                   variant="outlined"

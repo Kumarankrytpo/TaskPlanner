@@ -8,6 +8,7 @@ import { FaBuffer } from "react-icons/fa6";
 import TaskCreation from "./TaskCreation";
 import TaskDashboard from "./TaskDashboard";
 import { GlobalContext } from "./utils/GlobalContext";
+import { MdFactCheck , MdHourglassDisabled } from "react-icons/md";
 
 import "./dashboard.css";
 import OverdueTaskDetails from "./OverdueTaskDetails";
@@ -36,12 +37,12 @@ function addingTabDetails(role) {
     {
       label: "Task Details",
       key: "taskdetails",
-      icon: <MdDashboard />,
+      icon: <MdFactCheck />,
     },
     {
       label: "Overdue Task",
       key: "overduetask",
-      icon: <MdDashboard />,
+      icon: < MdHourglassDisabled  />,
     },
     {
       label: "Role Creation",
